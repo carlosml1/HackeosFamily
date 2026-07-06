@@ -943,39 +943,40 @@ const SPAWN_BASE = 2600;
 const EXTENSION_AUDIO = ".mp3";
 
 const audiosDisponibles = [
-    "CONTRAMEDIDAS",
+    "AMETRALLADORA",
+    "ARMA",
+    "ARMAMENTO",
+    "BALA",
+    "CAMUFLAJE",
+    "CARTUCHERA",
+    "CLANDESTINIDAD",
     "COARTADA",
+    "COMUNICACIONES",
+    "CONTRABANDO",
+    "CONTRAMEDIDA",
+    "CONTRAMEDIDAS",
+    "DESCIFRADO",
+    "DESENCRIPTAR",
+    "EMPUÑADURA",
+    "ESCALAMIENTO",
+    "EXFILTRACION",
+    "EXTORSION",
+    "EXTRACCION",
+    "FTRACCION",
+    "FRECUENCIA",
+    "INFILTRACION",
+    "INTERCEPTACION",
+    "INTIMIDACION",
+    "LANZAGRANADAS",
+    "MANIPULACION",
+    "MUNICIONES",
+    "PERSECUCION",
     "PLANCHABRAGAS",
     "PLANCHABRAGUIS",
-    "ARMA",
-    "EXFLITRACION",
-    "CAMUFLAJE",
-    "DESCIFRADO",
-    "PERSECUCION",
-    "BALA",
-    "VULNERABILIDAD",
-    "CONTRABANDO",
-    "SABOTAJE",
-    "INFILTRACION",
-    "LANZAGRANADAS",
-    "EXTORSION",
-    "CLANDESTINIDAD",
-    "CARTUCHERA",
-    "MANIPULACION",
-    "EMPUÑADURA",
-    "ARMAMENTO",
-    "INTIMIDACION",
-    "ESCALAMIENTO",
-    "AMETRALLADORA",
-    "VIGILANCIA",
-    "INTERCEPTACION",
-    "FRECUENCIA",
     "REVOLVER",
-    "EXTRACCION",
-    "COMUNICACION",
-    "DESENCRIPTAR",
-    "ENCAPUCHADO",
-    "MUNICIONES"
+    "SABOTAJE",
+    "VIGILANCIA",
+    "VULNERABILIDAD"
 ];
 
 function obtenerAudioAleatorio() {
@@ -1010,17 +1011,13 @@ function obtenerCarpetaUsuario() {
 */
 
 function obtenerRutaAudio(palabra) {
+    const carpeta = userSelect.value.trim().toLowerCase();
 
-    const carpeta =
-        obtenerCarpetaUsuario();
+    const ruta = `./audio/${carpeta}/${palabra}.mp3`;
 
-    return (
-        "audio/" +
-        carpeta +
-        "/" +
-        palabra +
-        EXTENSION_AUDIO
-    );
+    console.log("INTENTANDO REPRODUCIR:", ruta);
+
+    return ruta;
 }
 
 
@@ -1031,54 +1028,43 @@ function obtenerRutaAudio(palabra) {
 
 function reproducirAudio(palabra) {
 
-    /*
-        Detener audio anterior.
-    */
-
     if (audioActual) {
-
         audioActual.pause();
-
         audioActual.currentTime = 0;
-
     }
 
+    const ruta = obtenerRutaAudio(palabra);
 
-    /*
-        Crear nuevo audio.
-    */
+    console.log("CARGANDO AUDIO:", ruta);
 
-    audioActual =
-        new Audio(
-            obtenerRutaAudio(palabra)
+    audioActual = new Audio();
+
+    audioActual.volume = Number(volumeSlider.value);
+
+    audioActual.addEventListener("canplaythrough", () => {
+
+        console.log("AUDIO CARGADO CORRECTAMENTE:", ruta);
+
+        audioActual.play().catch(error => {
+            console.error("ERROR AL REPRODUCIR:", ruta, error);
+        });
+
+    }, { once: true });
+
+    audioActual.addEventListener("error", () => {
+
+        console.error(
+            "ARCHIVO MP3 NO ENCONTRADO O INVÁLIDO:",
+            ruta,
+            audioActual.error
         );
 
+    }, { once: true });
 
-    /*
-        Aplicar volumen seleccionado.
-    */
+    audioActual.src = ruta;
 
-    audioActual.volume =
-        Number(volumeSlider.value);
-
-
-    /*
-        Reproducir.
-    */
-
-    audioActual
-        .play()
-        .catch(error => {
-
-            console.error(
-                "No se pudo reproducir:",
-                obtenerRutaAudio(palabra),
-                error
-            );
-
-        });
+    audioActual.load();
 }
-
 /* =========================================================
    CONTROLES
 ========================================================= */
