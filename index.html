@@ -942,6 +942,48 @@ const SPAWN_BASE = 2600;
 
 const EXTENSION_AUDIO = ".mp3";
 
+const audiosDisponibles = [
+    "CONTRAMEDIDAS",
+    "COARTADA",
+    "PLANCHABRAGAS",
+    "PLANCHABRAGUIS",
+    "ARMA",
+    "EXFLITRACION",
+    "CAMUFLAJE",
+    "DESCIFRADO",
+    "PERSECUCION",
+    "BALA",
+    "VULNERABILIDAD",
+    "CONTRABANDO",
+    "SABOTAJE",
+    "INFILTRACION",
+    "LANZAGRANADAS",
+    "EXTORSION",
+    "CLANDESTINIDAD",
+    "CARTUCHERA",
+    "MANIPULACION",
+    "EMPUÑADURA",
+    "ARMAMENTO",
+    "INTIMIDACION",
+    "ESCALAMIENTO",
+    "AMETRALLADORA",
+    "VIGILANCIA",
+    "INTERCEPTACION",
+    "FRECUENCIA",
+    "REVOLVER",
+    "EXTRACCION",
+    "COMUNICACION",
+    "DESENCRIPTAR",
+    "ENCAPUCHADO",
+    "MUNICIONES"
+];
+
+function obtenerAudioAleatorio() {
+    return audiosDisponibles[
+        Math.floor(Math.random() * audiosDisponibles.length)
+    ];
+}
+
 let audioActual = null;
 
 
@@ -1167,36 +1209,7 @@ function crearPalabra() {
         exactamente a este recuadro.
     */
 
-    reproducirAudio(respuestaCorrecta)
-        .catch(error => {
-
-            console.error(
-                "Error reproduciendo:",
-                respuestaCorrecta,
-                error
-            );
-
-            /*
-                IMPORTANTE:
-
-                Si por algún motivo falla
-                el audio, eliminamos el recuadro.
-
-                Así nunca puede quitar una vida
-                una palabra imposible de responder.
-            */
-
-            const indice =
-                palabrasActivas.findIndex(
-                    palabra =>
-                        palabra.elemento === elemento
-                );
-
-            if (indice !== -1) {
-                eliminarPalabra(indice);
-            }
-
-        });
+    reproducirAudio(respuestaCorrecta);
 }
 
 function eliminarPalabra(indice) {
@@ -1396,111 +1409,41 @@ function gameLoop(tiempoActual) {
 }
 
 
-async function iniciarJuegoPalabras() {
+function iniciarJuegoPalabras() {
 
     if (jugando) {
         return;
     }
 
-    startScreen.style.pointerEvents = "none";
-
-    const textoOriginal =
-        startScreen.querySelector(
-            ".start-title"
-        ).textContent;
-
-    startScreen.querySelector(
-        ".start-title"
-    ).textContent =
-        "LOADING AUDIO";
-
-
-    /*
-        Comprobar archivos existentes.
-    */
-
-    const hayAudios =
-        await cargarAudiosValidos();
-
-
-    if (!hayAudios) {
-
-        startScreen.querySelector(
-            ".start-title"
-        ).textContent =
-            "AUDIO ERROR";
-
-        startScreen.querySelector(
-            ".start-subtitle"
-        ).textContent =
-            "NO SE ENCONTRARON ARCHIVOS";
-
-        startScreen.style.pointerEvents =
-            "auto";
-
-        return;
-    }
-
-
-    startScreen.querySelector(
-        ".start-title"
-    ).textContent =
-        textoOriginal;
-
-
-    startScreen.style.pointerEvents =
-        "auto";
-
-
     jugando = true;
 
     puntuacion = 0;
-
     vidas = 3;
 
     ultimoTiempo = 0;
-
     tiempoSpawn = 0;
 
-
-    palabrasActivas.forEach(
-        palabra =>
-            palabra.elemento.remove()
-    );
+    palabrasActivas.forEach(palabra => {
+        palabra.elemento.remove();
+    });
 
     palabrasActivas = [];
 
+    startScreen.style.display = "none";
+    wordsEndScreen.style.display = "none";
 
-    startScreen.style.display =
-        "none";
-
-    wordsEndScreen.style.display =
-        "none";
-
-
-    wordInput.disabled =
-        false;
-
-    wordInput.value =
-        "";
-
+    wordInput.disabled = false;
+    wordInput.value = "";
     wordInput.focus();
 
-
-    systemText.textContent =
-        "ENTER = SEND";
-
+    systemText.textContent = "ENTER = SEND";
 
     actualizarInterfaz();
 
-
     crearPalabra();
 
-
-    animationId =
-        requestAnimationFrame(gameLoop);
+    animationId = requestAnimationFrame(gameLoop);
 }
-
 function detenerJuegoPalabras() {
 
     jugando = false;
