@@ -962,7 +962,7 @@ const audiosDisponibles = [
     "EXFILTRACION",
     "EXTORSION",
     "EXTRACCION",
-    "FTRACCION",
+    "FRACTURACION",
     "FRECUENCIA",
     "INFILTRACION",
     "INTERCEPTACION",
@@ -994,11 +994,7 @@ let audioActual = null;
 */
 
 function obtenerCarpetaUsuario() {
-
-    return userSelect
-        .value
-        .trim()
-        .toLowerCase();
+    return userSelect.value.trim().toUpperCase();
 }
 
 
@@ -1011,13 +1007,7 @@ function obtenerCarpetaUsuario() {
 */
 
 function obtenerRutaAudio(palabra) {
-    const carpeta = userSelect.value.trim().toLowerCase();
-
-    const ruta = `./audio/${carpeta}/${palabra}.mp3`;
-
-    console.log("INTENTANDO REPRODUCIR:", ruta);
-
-    return ruta;
+    return `./audio/${obtenerCarpetaUsuario()}/${palabra}.mp3`;
 }
 
 
