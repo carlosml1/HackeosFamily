@@ -594,10 +594,232 @@ input[type="range"] {
     .menu-grid { grid-template-columns: 1fr; }
     .status-panel { margin-right: 0; }
 }
+
+.auth-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #071b2d 0%,
+            #020b14 65%,
+            #01060b 100%
+        );
+}
+
+.auth-screen.hidden {
+    display: none;
+}
+
+.auth-panel {
+    width: min(520px, 88vw);
+
+    padding: 45px;
+
+    border: 2px solid #2878ad;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(5, 27, 45, 0.98),
+            rgba(2, 14, 24, 0.98)
+        );
+
+    box-shadow:
+        0 0 35px rgba(0, 120, 200, 0.2),
+        inset 0 0 30px rgba(0, 100, 180, 0.08);
+}
+
+.auth-status {
+    margin-bottom: 25px;
+
+    color: #87bce5;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    letter-spacing: 2px;
+}
+
+.auth-panel h1 {
+    margin: 0 0 10px;
+
+    color: #e5efff;
+
+    font-size: 35px;
+
+    letter-spacing: 3px;
+
+    text-shadow:
+        0 0 8px #bcd8ff,
+        0 0 16px rgba(100, 170, 255, 0.4);
+}
+
+.auth-panel p {
+    margin-bottom: 30px;
+
+    color: #679bc3;
+
+    font-size: 13px;
+}
+
+.auth-field {
+    margin-bottom: 18px;
+}
+
+.auth-field.hidden {
+    display: none;
+}
+
+.auth-field label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #87bce5;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    letter-spacing: 1px;
+}
+
+.auth-field input {
+    box-sizing: border-box;
+
+    width: 100%;
+    height: 54px;
+
+    padding: 0 15px;
+
+    border: 2px solid #2878ad;
+
+    background: #020d16;
+
+    color: white;
+
+    font-family: "Courier New", monospace;
+    font-size: 17px;
+    font-weight: bold;
+
+    outline: none;
+}
+
+.auth-field input:focus {
+    border-color: #68ff91;
+
+    box-shadow:
+        0 0 12px rgba(104, 255, 145, 0.3);
+}
+
+#authMessage {
+    min-height: 22px;
+
+    margin: 15px 0;
+
+    color: #ff5e79;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    letter-spacing: 1px;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.auth-buttons button {
+    flex: 1;
+
+    padding: 14px;
+
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    background: transparent;
+}
+
+#authSubmit {
+    border: 2px solid #68ff91;
+
+    color: #68ff91;
+}
+
+#authSubmit:hover {
+    background: #68ff91;
+
+    color: #03111d;
+}
+
+#authChangeMode {
+    border: 2px solid #2878ad;
+
+    color: #87bce5;
+}
+
+#authChangeMode:hover {
+    background: #09243a;
+}
+
+.logout-button {
+    position: absolute;
+
+    top: 15px;
+    left: 15px;
+
+    z-index: 500;
+
+    width: 43px;
+    height: 43px;
+
+    border: 2px solid #ff526f;
+
+    background: #19060b;
+
+    color: #ff526f;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 0 12px rgba(255, 82, 111, 0.35);
+}
+
+.logout-button:hover {
+    background: #ff526f;
+
+    color: #19060b;
+}
+
+.hidden {
+    display: none !important;
+}
 </style>
 </head>
 <body>
-<div class="game-container menu-container">
+
+<button
+    id="logoutButton"
+    class="logout-button"
+    type="button"
+    title="Cerrar sesión"
+>
+    ⏻
+</button>
+
+<div id="mainApp" class="game-container menu-container hidden">
+    
     <header class="header">
         <div>
             <div class="system-user"><span class="online-dot"></span>LAFAUNA_OS</div>
@@ -635,6 +857,11 @@ input[type="range"] {
                 <span class="menu-card-title">ACCESS CODE</span>
                 <span class="menu-card-desc">Descifra el código usando pistas y deducción.</span>
             </a>
+            <a class="menu-card" href="codigos-enigma.html">
+                <span class="menu-card-code">ENIGMA_PATTERN</span>
+                <span class="menu-card-title">CODIGOS ENIGMA</span>
+                <span class="menu-card-desc">Compara patrones de puntos y descifra la secuencia correcta.</span>
+            </a>
         </section>
     </main>
 
@@ -643,5 +870,98 @@ input[type="range"] {
         <span>V1.0 // GAME SELECTOR</span>
     </footer>
 </div>
+<div id="authScreen" class="auth-screen">
+    <div class="auth-panel">
+
+        <div class="auth-status">
+            <span class="online-dot"></span>
+            LAFAUNA_OS // SECURE ACCESS
+        </div>
+
+        <h1 id="authTitle">IDENTIFICACION</h1>
+
+        <p id="authSubtitle">
+            INTRODUCE TUS CREDENCIALES
+        </p>
+
+        <div class="auth-field">
+            <label>USER</label>
+            <input
+                id="authUsername"
+                type="text"
+                autocomplete="username"
+                placeholder="NOMBRE"
+            >
+        </div>
+
+        <div class="auth-field">
+            <label>PASSWORD</label>
+            <input
+                id="authPassword"
+                type="password"
+                autocomplete="current-password"
+                placeholder="CONTRASEÑA"
+            >
+        </div>
+
+        <div
+            id="repeatPasswordField"
+            class="auth-field hidden"
+        >
+            <label>REPEAT PASSWORD</label>
+            <input
+                id="authPasswordRepeat"
+                type="password"
+                autocomplete="new-password"
+                placeholder="REPITE LA CONTRASEÑA"
+            >
+        </div>
+
+        <div id="authMessage"></div>
+
+        <div class="auth-buttons">
+
+            <button id="authSubmit">
+                LOGIN
+            </button>
+
+            <button id="authChangeMode">
+                REGISTER
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+<div id="whitelistScreen" class="auth-screen hidden">
+    <div class="auth-panel">
+
+        <div class="auth-status">
+            <span class="online-dot"></span>
+            LAFAUNA_OS // ACCESS CONTROL
+        </div>
+
+        <h1>WL PENDING</h1>
+
+        <p>
+            TU IDENTIDAD HA SIDO REGISTRADA.
+            ESPERA A QUE UN ADMINISTRADOR AUTORICE EL ACCESO.
+        </p>
+
+        <div id="whitelistUsername"></div>
+
+        <button
+            id="whitelistLogout"
+            type="button"
+        >
+            CERRAR SESION
+        </button>
+
+    </div>
+</div>
+
+<script type="module" src="./firebase-auth.js"></script>
+
 </body>
 </html>
