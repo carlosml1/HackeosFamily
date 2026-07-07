@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMMUNATION</title>
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    background:
+        radial-gradient(circle at center, #071a2b 0%, #020b14 65%, #01060c 100%);
+    color: #d8eaff;
+    font-family: "Courier New", monospace;
+    overflow: hidden;
+}
+
+.game-container {
+    position: absolute;
+    top: 2.5vh;
+    left: 3vw;
+    width: 94vw;
+    height: 95vh;
+    padding: 26px;
+    border: 2px solid #17649a;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(5, 27, 45, 0.97),
+            rgba(3, 19, 32, 0.97)
+        );
+    box-shadow:
+        0 0 35px rgba(0, 102, 170, 0.12),
+        inset 0 0 35px rgba(0, 70, 120, 0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================================
+   NAVEGACIÓN
+========================================================= */
+
+.top-navigation {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    z-index: 100;
+}
+
+.nav-button {
+    width: 55px;
+    height: 40px;
+    border: 2px solid #3180b8;
+    background: #03131f;
+    color: #68ff95;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(49, 128, 184, 0.5);
+}
+
+.nav-button:hover {
+    background: #09243a;
+    box-shadow: 0 0 15px rgba(101, 255, 145, 0.5);
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-shrink: 0;
+}
+
+.system-user {
+    font-size: 13px;
+    font-weight: bold;
+    color: #8fc6ee;
+    letter-spacing: 1px;
+}
+
+.online-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background: #61ff91;
+    box-shadow:
+        0 0 7px #61ff91,
+        0 0 15px #61ff91;
+}
+
+.title {
+    margin-top: 18px;
+    font-size: clamp(28px, 3vw, 48px);
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: #e2eeff;
+    text-shadow:
+        0 0 7px #c6dcff,
+        0 0 15px rgba(120, 180, 255, 0.5);
+}
+
+.status-panel {
+    text-align: right;
+    margin-right: 75px;
+}
+
+.status-tags {
+    margin-bottom: 20px;
+}
+
+.tag {
+    display: inline-block;
+    padding: 3px 10px;
+    margin-left: 6px;
+    border: 1px solid #265a7d;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.tag-live {
+    color: #68ff95;
+    border-color: #238b4e;
+}
+
+.score-line {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.score {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.hearts {
+    font-size: 25px;
+    color: #ff7089;
+}
+
+/* =========================================================
+   PÁGINAS
+========================================================= */
+
+.page {
+    display: none;
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+}
+
+.page.active {
+    display: flex;
+}
+
+/* =========================================================
+   CONTROLES
+========================================================= */
+
+.controls {
+    min-height: 58px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: bold;
+    color: #87bce5;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+select {
+    background: #03131f;
+    color: #68ff95;
+    border: 1px solid #277c52;
+    padding: 8px 10px;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    outline: none;
+}
+
+input[type="range"] {
+    width: 145px;
+    accent-color: #67ff91;
+}
+
+.control-value {
+    min-width: 45px;
+    color: #68ff95;
+}
+
+/* =========================================================
+   ÁREA DE JUEGO
+========================================================= */
+
+.game-area {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    border: 2px solid #174f76;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(40, 130, 190, 0.025) 0,
+            rgba(40, 130, 190, 0.025) 1px,
+            transparent 1px,
+            transparent 4px
+        ),
+        linear-gradient(
+            180deg,
+            #061b2e,
+            #03121f
+        );
+}
+
+/* =========================================================
+   PANTALLAS INICIO Y FINAL
+========================================================= */
+
+.start-screen,
+.end-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(1, 11, 19, 0.90);
+    text-align: center;
+}
+
+.end-screen {
+    display: none;
+}
+
+.start-title,
+.end-title {
+    color: #ff526f;
+    font-size: clamp(45px, 6vw, 85px);
+    font-weight: bold;
+    text-shadow:
+        0 0 7px currentColor,
+        0 0 18px currentColor;
+}
+
+.start-subtitle,
+.end-message {
+    margin-top: 25px;
+    color: #65ff91;
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* =========================================================
+   JUEGO DE PALABRAS
+========================================================= */
+
+.falling-word {
+    position: absolute;
+    top: 0;
+    padding: 9px 15px;
+    white-space: nowrap;
+    color: #e7f1ff;
+    border: 2px solid #3180b8;
+    background: rgba(12, 46, 73, 0.85);
+    font-size: clamp(14px, 1.4vw, 21px);
+    font-weight: bold;
+    box-shadow:
+        0 0 6px rgba(70, 170, 255, 0.8),
+        inset 0 0 10px rgba(80, 170, 255, 0.12);
+}
+
+.bottom-panel {
+    margin-top: 15px;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.word-input {
+    flex: 1;
+    height: 76px;
+    padding: 0 28px;
+    background: #020e17;
+    border: 4px solid #68ff91;
+    color: #f0f5ff;
+    font-family: "Courier New", monospace;
+    font-size: clamp(20px, 2vw, 32px);
+    font-weight: bold;
+    text-transform: uppercase;
+    outline: none;
+}
+
+.word-input.input-error {
+    border-color: #ff526f;
+    box-shadow:
+        0 0 14px rgba(255, 82, 111, 0.85),
+        inset 0 0 12px rgba(255, 82, 111, 0.12);
+}
+
+.game-container.screen-shake {
+    animation: screenShake 180ms linear 2;
+}
+
+.game-area.life-warning {
+    border-color: #ff526f;
+    box-shadow:
+        0 0 28px rgba(255, 82, 111, 0.72),
+        inset 0 0 24px rgba(255, 82, 111, 0.12);
+}
+
+@keyframes screenShake {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-7px, 3px); }
+    40% { transform: translate(6px, -3px); }
+    60% { transform: translate(-4px, 2px); }
+    80% { transform: translate(4px, -2px); }
+    100% { transform: translate(0, 0); }
+}
+
+.enter-label {
+    width: 150px;
+    text-align: center;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+.restart-button,
+.start-button {
+    margin-top: 30px;
+    padding: 14px 25px;
+    background: transparent;
+    border: 2px solid #65ff91;
+    color: #65ff91;
+    font-family: "Courier New", monospace;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.restart-button:hover,
+.start-button:hover {
+    color: #03111d;
+    background: #65ff91;
+}
+
+/* =========================================================
+   SEGUNDO JUEGO - AJUSTES
+========================================================= */
+
+.arrow-settings {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-box {
+    width: min(650px, 90%);
+    padding: 45px;
+    border: 2px solid #3180b8;
+    background: rgba(3, 19, 31, 0.96);
+    text-align: center;
+    box-shadow: 0 0 25px rgba(49, 128, 184, 0.3);
+}
+
+.settings-title {
+    font-size: 32px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: #e2eeff;
+}
+
+.settings-description {
+    margin: 15px 0 30px;
+    color: #6ca4cf;
+}
+
+.difficulty-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.difficulty-button {
+    min-width: 130px;
+    padding: 15px 25px;
+    background: #03131f;
+    border: 2px solid #3180b8;
+    color: #8fc6ee;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.difficulty-button.selected {
+    border-color: #65ff91;
+    color: #65ff91;
+    box-shadow: 0 0 10px rgba(101, 255, 145, 0.4);
+}
+
+/* =========================================================
+   SEGUNDO JUEGO - FLECHAS
+========================================================= */
+
+.arrow-game-content {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.countdown {
+    font-size: 80px;
+    color: #ff526f;
+    font-weight: bold;
+    text-shadow: 0 0 15px rgba(255, 82, 111, 0.8);
+}
+
+.arrow-row {
+    width: 96%;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.arrow-box {
+    width: 65px;
+    height: 65px;
+    flex-shrink: 1;
+    border: 2px solid #3180b8;
+    background: rgba(12, 46, 73, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 37px;
+    font-weight: bold;
+    color: #e7f1ff;
+    box-shadow: 0 0 6px rgba(70, 170, 255, 0.7);
+}
+
+.arrow-box.current {
+    border-color: #65ff91;
+    color: #65ff91;
+    box-shadow: 0 0 15px rgba(101, 255, 145, 0.7);
+}
+
+.arrow-box.completed {
+    opacity: 0.3;
+    border-color: #238b4e;
+}
+
+.arrow-information {
+    margin-top: 35px;
+    font-size: 18px;
+    color: #87bce5;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    color: #6ca4cf;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width: 850px) {
+
+    .game-container {
+        top: 1vh;
+        left: 1vw;
+        width: 98vw;
+        height: 98vh;
+        padding: 15px;
+    }
+
+    .controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .arrow-box {
+        width: 45px;
+        height: 50px;
+        font-size: 27px;
+    }
+
+    .difficulty-options {
+        flex-direction: column;
+    }
+
+    .status-panel {
+        margin-right: 65px;
+    }
+}
+
+
+.nav-button {
+    width: auto;
+    min-width: 72px;
+    padding: 0 12px;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+<div class="game-container">
+
+    <!-- NAVEGACIÓN -->
+
+    <div class="top-navigation">
+        <button id="navButton" class="nav-button">MENU</button>
+    </div>
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div>
+
+            <div class="system-user">
+                <span class="online-dot"></span>
+                LAFAUNA_OS
+            </div>
+
+            <div class="title">RED INTERNA</div>
+
+        </div>
+
+        <div class="status-panel">
+
+            <div class="status-tags">
+
+                <span id="gameTag" class="tag">
+                    LETTERSFALL
+                </span>
+
+                <span class="tag tag-live">
+                    LIVE
+                </span>
+
+            </div>
+
+            <div class="score-line">
+
+                <span id="score" class="score">
+                    0/40
+                </span>
+
+                <span id="hearts" class="hearts">
+                    ♥ ♥ ♥
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    
+<!-- =====================================================
+         PÁGINA 1
+    ====================================================== -->
+
+    <div id="wordsPage" class="page active">
+
+        <section class="controls">
+
+            <div class="control-group">
+
+                <span>USER ♙</span>
+
+                <select id="userSelect">
+                    <option value="PANTERA">PANTERA</option>
+                    <option value="SULLY">SULLY</option>
+                </select>
+
+            </div>
+
+            <div class="control-group">
+
+                <span>VOL</span>
+
+                <input
+                    id="volumeSlider"
+                    type="range"
+                    min="0"
+                    max="2"
+                    value="1"
+                    step="0.1"
+                >
+
+                <span id="volumeValue" class="control-value">
+                    1.0X
+                </span>
+
+            </div>
+
+            <div class="control-group">
+
+                <span>SPEED</span>
+
+                <input
+                    id="speedSlider"
+                    type="range"
+                    min="0.5"
+                    max="2"
+                    value="1.2"
+                    step="0.1"
+                >
+
+                <span id="speedValue" class="control-value">
+                    1.2X
+                </span>
+
+            </div>
+
+        </section>
+
+        <main id="gameArea" class="game-area">
+
+            <div id="startScreen" class="start-screen">
+
+                <div class="start-title">
+                    PRESS TO START
+                </div>
+
+                <div class="start-subtitle">
+                    CLICK OR PRESS ENTER
+                </div>
+
+            </div>
+
+            <div id="wordsEndScreen" class="end-screen">
+
+                <div id="wordsEndTitle" class="end-title"></div>
+
+                <div id="wordsEndMessage" class="end-message"></div>
+
+                <button id="wordsRestartButton" class="restart-button">
+                    REINICIAR SISTEMA
+                </button>
+
+            </div>
+
+        </main>
+
+        <section class="bottom-panel">
+
+            <div class="input-row">
+
+                <input
+                    id="wordInput"
+                    class="word-input"
+                    autocomplete="off"
+                    spellcheck="false"
+                    disabled
+                >
+
+                <div id="systemText" class="enter-label">
+                    SYSTEM = LOADING
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    
+<!-- FOOTER -->
+
+    <footer class="footer">
+
+        <span>
+            ZOOM: C$ROB:AMMU_ROOM:NO_MOROS
+        </span>
+
+        <span>
+            V0.8 // SECURE CONNECTION
+        </span>
+
+    </footer>
+
+
+</div>
+<script>
+const navButton = document.getElementById("navButton");
+navButton.addEventListener("click", () => {
+    window.location.href = "index.html";
+});
+const respuestas = [
+    "CONTRAMEDIDAS",
+    "COARTADA",
+    "PLANCHABRAGAS",
+    "PLANCHABRAGUIS",
+    "ARMA",
+    "EXFLITRACION",
+    "CAMUFLAJE",
+    "DESCIFRADO",
+    "PERSECUCION",
+    "BALA",
+    "VULNERABILIDAD",
+    "CONTRABANDO",
+    "SABOTAJE",
+    "INFILTRACION",
+    "LANZAGRANADAS",
+    "EXTORSION",
+    "CLANDESTINIDAD",
+    "CARTUCHERA",
+    "MANIPULACION",
+    "EMPUÑADURA",
+    "ARMAMENTO",
+    "INTIMIDACION",
+    "ESCALAMIENTO",
+    "AMETRALLADORA",
+    "VIGILANCIA",
+    "INTERCEPTACION",
+    "FRECUENCIA",
+    "REVOLVER",
+    "EXTRACCION",
+    "COMUNICACION",
+    "DESENCRIPTAR",
+    "ENCAPUCHADO",
+    "MUNICIONES"
+];
+
+const gameArea =
+    document.getElementById("gameArea");
+
+const gameContainer =
+    document.querySelector(".game-container");
+
+const startScreen =
+    document.getElementById("startScreen");
+
+const wordInput =
+    document.getElementById("wordInput");
+
+const scoreElement =
+    document.getElementById("score");
+
+const heartsElement =
+    document.getElementById("hearts");
+
+const systemText =
+    document.getElementById("systemText");
+
+const speedSlider =
+    document.getElementById("speedSlider");
+
+const speedValue =
+    document.getElementById("speedValue");
+
+const volumeSlider =
+    document.getElementById("volumeSlider");
+
+const volumeValue =
+    document.getElementById("volumeValue");
+
+const wordsEndScreen =
+    document.getElementById("wordsEndScreen");
+
+const wordsEndTitle =
+    document.getElementById("wordsEndTitle");
+
+const wordsEndMessage =
+    document.getElementById("wordsEndMessage");
+
+const wordsRestartButton =
+    document.getElementById("wordsRestartButton");
+
+
+/* =========================================================
+   JUEGO DE PALABRAS - VARIABLES
+========================================================= */
+
+let jugando = false;
+
+let puntuacion = 0;
+
+let vidas = 3;
+
+let palabrasActivas = [];
+
+let ultimoTiempo = 0;
+
+let tiempoSpawn = 0;
+
+let animationId = null;
+
+const VELOCIDAD_BASE = 35;
+
+const SPAWN_BASE = 2600;
+
+/* =========================================================
+   CONFIGURACIÓN DE AUDIO
+========================================================= */
+
+const EXTENSION_AUDIO = ".mp3";
+
+const audiosDisponibles = [
+    "AMETRALLADORA",
+    "ARMA",
+    "ARMAMENTO",
+    "BALA",
+    "CAMUFLAJE",
+    "CARTUCHERA",
+    "CLANDESTINIDAD",
+    "COARTADA",
+    "COMUNICACIONES",
+    "CONTRABANDO",
+    "CONTRAMEDIDA",
+    "CONTRAMEDIDAS",
+    "DESCIFRADO",
+    "DESENCRIPTAR",
+    "EMPUÑADURA",
+    "ESCALAMIENTO",
+    "EXFILTRACION",
+    "EXTORSION",
+    "EXTRACCION",
+    "FRACTURACION",
+    "FRECUENCIA",
+    "INFILTRACION",
+    "INTERCEPTACION",
+    "INTIMIDACION",
+    "LANZAGRANADAS",
+    "MANIPULACION",
+    "MUNICIONES",
+    "PERSECUCION",
+    "PLANCHABRAGAS",
+    "PLANCHABRAGUIS",
+    "REVOLVER",
+    "SABOTAJE",
+    "VIGILANCIA",
+    "VULNERABILIDAD"
+];
+
+function obtenerAudioAleatorio() {
+    return audiosDisponibles[
+        Math.floor(Math.random() * audiosDisponibles.length)
+    ];
+}
+
+let audioActual = null;
+let audioContext = null;
+let audioGain = null;
+let audioSource = null;
+let inputErrorTimeout = null;
+let lifeWarningTimeout = null;
+
+
+/*
+    Convierte el usuario seleccionado
+    en el nombre de su carpeta.
+*/
+
+function obtenerCarpetaUsuario() {
+    return userSelect.value.trim().toUpperCase();
+}
+
+
+/*
+    Crear la ruta del audio.
+
+    Ejemplo:
+
+    audio/pantera/BALA.mp3
+*/
+
+function obtenerRutaAudio(palabra) {
+    return `./audio/${obtenerCarpetaUsuario()}/${palabra}.mp3`;
+}
+
+function obtenerMultiplicadorVolumen() {
+    return Number(volumeSlider.value);
+}
+
+function aplicarVolumenActual() {
+    const volumen = obtenerMultiplicadorVolumen();
+
+    if (audioGain) {
+        audioGain.gain.value = volumen;
+        return;
+    }
+
+    if (audioActual) {
+        audioActual.volume = Math.min(volumen, 1);
+    }
+}
+
+function obtenerAudioContext() {
+    const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+        return null;
+    }
+
+    if (!audioContext) {
+        audioContext = new AudioContextClass();
+    }
+
+    return audioContext;
+}
+
+function prepararSalidaAudio() {
+    const contexto = obtenerAudioContext();
+
+    if (!contexto) {
+        aplicarVolumenActual();
+        return;
+    }
+
+    audioSource = contexto.createMediaElementSource(audioActual);
+    audioGain = contexto.createGain();
+    audioGain.gain.value = obtenerMultiplicadorVolumen();
+    audioSource.connect(audioGain);
+    audioGain.connect(contexto.destination);
+}
+
+function reproducirBipError() {
+    const contexto = obtenerAudioContext();
+
+    if (!contexto) {
+        return;
+    }
+
+    if (contexto.state === "suspended") {
+        contexto.resume();
+    }
+
+    const oscilador = contexto.createOscillator();
+    const ganancia = contexto.createGain();
+
+    oscilador.type = "square";
+    oscilador.frequency.value = 180;
+    ganancia.gain.setValueAtTime(0.001, contexto.currentTime);
+    ganancia.gain.exponentialRampToValueAtTime(0.06, contexto.currentTime + 0.01);
+    ganancia.gain.exponentialRampToValueAtTime(0.001, contexto.currentTime + 0.13);
+
+    oscilador.connect(ganancia);
+    ganancia.connect(contexto.destination);
+    oscilador.start();
+    oscilador.stop(contexto.currentTime + 0.14);
+}
+
+function avisarRespuestaIncorrecta() {
+    clearTimeout(inputErrorTimeout);
+
+    wordInput.classList.remove("input-error");
+    gameContainer.classList.remove("screen-shake");
+
+    void wordInput.offsetWidth;
+    void gameContainer.offsetWidth;
+
+    wordInput.classList.add("input-error");
+    gameContainer.classList.add("screen-shake");
+    reproducirBipError();
+
+    inputErrorTimeout = setTimeout(() => {
+        wordInput.classList.remove("input-error");
+        gameContainer.classList.remove("screen-shake");
+    }, 420);
+}
+
+function avisarVidaPerdida() {
+    clearTimeout(lifeWarningTimeout);
+
+    gameArea.classList.add("life-warning");
+
+    lifeWarningTimeout = setTimeout(() => {
+        gameArea.classList.remove("life-warning");
+    }, 750);
+}
+
+
+/*
+    Reproducir el audio asociado
+    a una palabra.
+*/
+
+function reproducirAudio(palabra) {
+
+    if (audioActual) {
+        audioActual.pause();
+        audioActual.currentTime = 0;
+    }
+
+    const ruta = obtenerRutaAudio(palabra);
+
+    console.log("CARGANDO AUDIO:", ruta);
+
+    audioActual = new Audio();
+    audioGain = null;
+    audioSource = null;
+
+    prepararSalidaAudio();
+
+    audioActual.addEventListener("canplaythrough", () => {
+
+        console.log("AUDIO CARGADO CORRECTAMENTE:", ruta);
+
+        if (audioContext && audioContext.state === "suspended") {
+            audioContext.resume();
+        }
+
+        audioActual.play().catch(error => {
+            console.error("ERROR AL REPRODUCIR:", ruta, error);
+        });
+
+    }, { once: true });
+
+    audioActual.addEventListener("error", () => {
+
+        console.error(
+            "ARCHIVO MP3 NO ENCONTRADO O INVÁLIDO:",
+            ruta,
+            audioActual.error
+        );
+
+    }, { once: true });
+
+    audioActual.src = ruta;
+
+    audioActual.load();
+}
+/* =========================================================
+   CONTROLES
+========================================================= */
+
+speedSlider.addEventListener("input", function() {
+
+    speedValue.textContent =
+        Number(this.value).toFixed(1) + "X";
+
+});
+
+volumeSlider.addEventListener("input", function() {
+
+    volumeValue.textContent =
+        Number(this.value).toFixed(1) + "X";
+
+
+    /*
+        Cambiar volumen del audio
+        que esté sonando actualmente.
+    */
+
+    if (audioActual) {
+
+        aplicarVolumenActual();
+
+    }
+
+});
+
+
+/* =========================================================
+   FUNCIONES JUEGO PALABRAS
+========================================================= */
+
+function obtenerPalabraAleatoria() {
+
+    return respuestas[
+        Math.floor(
+            Math.random() * respuestas.length
+        )
+    ];
+
+}
+
+
+function crearPalabra() {
+
+    if (!jugando) {
+        return;
+    }
+
+    /*
+        Texto visible.
+
+        Puede ser cualquiera de la lista,
+        porque no necesita tener audio.
+    */
+
+    const textoVisible =
+        obtenerPalabraAleatoria();
+
+
+    /*
+        La respuesta correcta se obtiene
+        EXCLUSIVAMENTE de audios que sabemos
+        que existen.
+    */
+
+    const respuestaCorrecta =
+        obtenerAudioAleatorio();
+
+
+    if (!respuestaCorrecta) {
+
+        console.error(
+            "No hay audios válidos."
+        );
+
+        return;
+    }
+
+
+    const elemento =
+        document.createElement("div");
+
+    elemento.className =
+        "falling-word";
+
+    elemento.textContent =
+        textoVisible;
+
+    gameArea.appendChild(elemento);
+
+
+    const maxX =
+        Math.max(
+            0,
+            gameArea.clientWidth -
+            elemento.offsetWidth -
+            20
+        );
+
+
+    elemento.style.left =
+        (
+            10 +
+            Math.random() * maxX
+        ) + "px";
+
+
+    palabrasActivas.push({
+
+        textoVisible,
+
+        respuestaCorrecta,
+
+        elemento,
+
+        y: -elemento.offsetHeight
+
+    });
+
+
+    /*
+        Reproducir el audio que corresponde
+        exactamente a este recuadro.
+    */
+
+    reproducirAudio(respuestaCorrecta);
+}
+
+function eliminarPalabra(indice) {
+
+    if (!palabrasActivas[indice]) {
+        return;
+    }
+
+    palabrasActivas[indice]
+        .elemento
+        .remove();
+
+    palabrasActivas.splice(
+        indice,
+        1
+    );
+
+}
+
+
+function actualizarInterfaz() {
+
+    scoreElement.textContent =
+        puntuacion + "/40";
+
+    let corazones = "";
+
+    for (let i = 0; i < 3; i++) {
+
+        corazones +=
+            i < vidas
+                ? "♥ "
+                : "♡ ";
+
+    }
+
+    heartsElement.textContent =
+        corazones.trim();
+
+}
+
+
+function comprobarRespuesta() {
+
+    if (!jugando) {
+        return;
+    }
+
+
+    const respuestaUsuario =
+
+        wordInput
+            .value
+            .trim()
+            .toUpperCase();
+
+
+    wordInput.value = "";
+
+
+    if (
+        respuestaUsuario === ""
+    ) {
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       BUSCAR POR EL AUDIO, NO POR EL TEXTO VISIBLE
+    ====================================================== */
+
+    const indice =
+
+        palabrasActivas.findIndex(
+
+            palabra =>
+
+                palabra.respuestaCorrecta ===
+                respuestaUsuario
+
+        );
+
+
+    /* =====================================================
+       RESPUESTA CORRECTA
+    ====================================================== */
+
+    if (
+        indice !== -1
+    ) {
+
+        eliminarPalabra(indice);
+
+        puntuacion++;
+
+        actualizarInterfaz();
+
+
+        if (
+            puntuacion >= 40
+        ) {
+
+            terminarJuegoPalabras(true);
+
+        }
+
+        return;
+
+    }
+
+    avisarRespuestaIncorrecta();
+
+}
+
+
+function gameLoop(tiempoActual) {
+
+    if (!jugando) {
+        return;
+    }
+
+    if (ultimoTiempo === 0) {
+
+        ultimoTiempo =
+            tiempoActual;
+
+    }
+
+    const deltaTime =
+        (
+            tiempoActual -
+            ultimoTiempo
+        ) / 1000;
+
+    ultimoTiempo =
+        tiempoActual;
+
+    const velocidad =
+        Number(speedSlider.value);
+
+    for (
+        let i = palabrasActivas.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        const palabra =
+            palabrasActivas[i];
+
+        palabra.y +=
+            VELOCIDAD_BASE *
+            velocidad *
+            deltaTime;
+
+        palabra.elemento.style.transform =
+            `translateY(${palabra.y}px)`;
+
+        if (
+            palabra.y +
+            palabra.elemento.offsetHeight >=
+            gameArea.clientHeight
+        ) {
+
+            eliminarPalabra(i);
+
+            vidas--;
+
+            avisarVidaPerdida();
+
+            actualizarInterfaz();
+
+            if (vidas <= 0) {
+
+                terminarJuegoPalabras(false);
+
+                return;
+
+            }
+
+        }
+
+    }
+
+    tiempoSpawn +=
+        deltaTime * 1000;
+
+    if (
+        tiempoSpawn >=
+        SPAWN_BASE / velocidad
+    ) {
+
+        crearPalabra();
+
+        tiempoSpawn = 0;
+
+    }
+
+    animationId =
+        requestAnimationFrame(gameLoop);
+
+}
+
+
+function iniciarJuegoPalabras() {
+
+    if (jugando) {
+        return;
+    }
+
+    jugando = true;
+
+    puntuacion = 0;
+    vidas = 3;
+
+    ultimoTiempo = 0;
+    tiempoSpawn = 0;
+
+    palabrasActivas.forEach(palabra => {
+        palabra.elemento.remove();
+    });
+
+    palabrasActivas = [];
+
+    startScreen.style.display = "none";
+    wordsEndScreen.style.display = "none";
+
+    wordInput.disabled = false;
+    wordInput.value = "";
+    wordInput.classList.remove("input-error");
+    gameArea.classList.remove("life-warning");
+    gameContainer.classList.remove("screen-shake");
+    wordInput.focus();
+
+    systemText.textContent = "ENTER = SEND";
+
+    actualizarInterfaz();
+
+    crearPalabra();
+
+    animationId = requestAnimationFrame(gameLoop);
+}
+function detenerJuegoPalabras() {
+
+    jugando = false;
+
+    cancelAnimationFrame(animationId);
+
+    wordInput.disabled = true;
+
+
+    /*
+        Detener audio actual.
+    */
+
+    if (audioActual) {
+
+        audioActual.pause();
+
+        audioActual.currentTime = 0;
+
+        audioActual = null;
+
+    }
+
+}
+
+
+function terminarJuegoPalabras(victoria) {
+
+    detenerJuegoPalabras();
+
+    wordsEndScreen.style.display =
+        "flex";
+
+    wordsEndTitle.textContent =
+        victoria
+            ? "ACCESS GRANTED"
+            : "CONNECTION LOST";
+
+    wordsEndTitle.style.color =
+        victoria
+            ? "#65ff91"
+            : "#ff526f";
+
+    wordsEndMessage.textContent =
+        victoria
+            ? "OBJETIVO COMPLETADO"
+            : "SISTEMA COMPROMETIDO";
+
+}
+
+
+/* =========================================================
+   EVENTOS PRIMER JUEGO
+========================================================= */
+
+startScreen.addEventListener(
+    "click",
+    iniciarJuegoPalabras
+);
+
+
+wordsRestartButton.addEventListener(
+    "click",
+    iniciarJuegoPalabras
+);
+
+
+wordInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (event.key === "Enter") {
+
+            event.preventDefault();
+
+            comprobarRespuesta();
+
+        }
+
+    }
+);
+
+
+
+/* =========================================================
+   EVENTOS GENERALES DEL TECLADO
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+        if (
+            event.key === "Enter" &&
+            !jugando &&
+            startScreen.style.display !== "none"
+        ) {
+            iniciarJuegoPalabras();
+        }
+    }
+);
+</script>
+</body>
+</html>

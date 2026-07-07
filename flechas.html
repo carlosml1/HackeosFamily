@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLECHAS</title>
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    background:
+        radial-gradient(circle at center, #071a2b 0%, #020b14 65%, #01060c 100%);
+    color: #d8eaff;
+    font-family: "Courier New", monospace;
+    overflow: hidden;
+}
+
+.game-container {
+    position: absolute;
+    top: 2.5vh;
+    left: 3vw;
+    width: 94vw;
+    height: 95vh;
+    padding: 26px;
+    border: 2px solid #17649a;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(5, 27, 45, 0.97),
+            rgba(3, 19, 32, 0.97)
+        );
+    box-shadow:
+        0 0 35px rgba(0, 102, 170, 0.12),
+        inset 0 0 35px rgba(0, 70, 120, 0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================================
+   NAVEGACIÓN
+========================================================= */
+
+.top-navigation {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    z-index: 100;
+}
+
+.nav-button {
+    width: 55px;
+    height: 40px;
+    border: 2px solid #3180b8;
+    background: #03131f;
+    color: #68ff95;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(49, 128, 184, 0.5);
+}
+
+.nav-button:hover {
+    background: #09243a;
+    box-shadow: 0 0 15px rgba(101, 255, 145, 0.5);
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-shrink: 0;
+}
+
+.system-user {
+    font-size: 13px;
+    font-weight: bold;
+    color: #8fc6ee;
+    letter-spacing: 1px;
+}
+
+.online-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background: #61ff91;
+    box-shadow:
+        0 0 7px #61ff91,
+        0 0 15px #61ff91;
+}
+
+.title {
+    margin-top: 18px;
+    font-size: clamp(28px, 3vw, 48px);
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: #e2eeff;
+    text-shadow:
+        0 0 7px #c6dcff,
+        0 0 15px rgba(120, 180, 255, 0.5);
+}
+
+.status-panel {
+    text-align: right;
+    margin-right: 75px;
+}
+
+.status-tags {
+    margin-bottom: 20px;
+}
+
+.tag {
+    display: inline-block;
+    padding: 3px 10px;
+    margin-left: 6px;
+    border: 1px solid #265a7d;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.tag-live {
+    color: #68ff95;
+    border-color: #238b4e;
+}
+
+.score-line {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.score {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.hearts {
+    font-size: 25px;
+    color: #ff7089;
+}
+
+/* =========================================================
+   PÁGINAS
+========================================================= */
+
+.page {
+    display: none;
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+}
+
+.page.active {
+    display: flex;
+}
+
+/* =========================================================
+   CONTROLES
+========================================================= */
+
+.controls {
+    min-height: 58px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: bold;
+    color: #87bce5;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+select {
+    background: #03131f;
+    color: #68ff95;
+    border: 1px solid #277c52;
+    padding: 8px 10px;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    outline: none;
+}
+
+input[type="range"] {
+    width: 145px;
+    accent-color: #67ff91;
+}
+
+.control-value {
+    min-width: 45px;
+    color: #68ff95;
+}
+
+/* =========================================================
+   ÁREA DE JUEGO
+========================================================= */
+
+.game-area {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    border: 2px solid #174f76;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(40, 130, 190, 0.025) 0,
+            rgba(40, 130, 190, 0.025) 1px,
+            transparent 1px,
+            transparent 4px
+        ),
+        linear-gradient(
+            180deg,
+            #061b2e,
+            #03121f
+        );
+}
+
+/* =========================================================
+   PANTALLAS INICIO Y FINAL
+========================================================= */
+
+.start-screen,
+.end-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(1, 11, 19, 0.90);
+    text-align: center;
+}
+
+.end-screen {
+    display: none;
+}
+
+.start-title,
+.end-title {
+    color: #ff526f;
+    font-size: clamp(45px, 6vw, 85px);
+    font-weight: bold;
+    text-shadow:
+        0 0 7px currentColor,
+        0 0 18px currentColor;
+}
+
+.start-subtitle,
+.end-message {
+    margin-top: 25px;
+    color: #65ff91;
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* =========================================================
+   JUEGO DE PALABRAS
+========================================================= */
+
+.falling-word {
+    position: absolute;
+    top: 0;
+    padding: 9px 15px;
+    white-space: nowrap;
+    color: #e7f1ff;
+    border: 2px solid #3180b8;
+    background: rgba(12, 46, 73, 0.85);
+    font-size: clamp(14px, 1.4vw, 21px);
+    font-weight: bold;
+    box-shadow:
+        0 0 6px rgba(70, 170, 255, 0.8),
+        inset 0 0 10px rgba(80, 170, 255, 0.12);
+}
+
+.bottom-panel {
+    margin-top: 15px;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.word-input {
+    flex: 1;
+    height: 76px;
+    padding: 0 28px;
+    background: #020e17;
+    border: 4px solid #68ff91;
+    color: #f0f5ff;
+    font-family: "Courier New", monospace;
+    font-size: clamp(20px, 2vw, 32px);
+    font-weight: bold;
+    text-transform: uppercase;
+    outline: none;
+}
+
+.enter-label {
+    width: 150px;
+    text-align: center;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+.restart-button,
+.start-button {
+    margin-top: 30px;
+    padding: 14px 25px;
+    background: transparent;
+    border: 2px solid #65ff91;
+    color: #65ff91;
+    font-family: "Courier New", monospace;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.restart-button:hover,
+.start-button:hover {
+    color: #03111d;
+    background: #65ff91;
+}
+
+/* =========================================================
+   SEGUNDO JUEGO - AJUSTES
+========================================================= */
+
+.arrow-settings {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-box {
+    width: min(650px, 90%);
+    padding: 45px;
+    border: 2px solid #3180b8;
+    background: rgba(3, 19, 31, 0.96);
+    text-align: center;
+    box-shadow: 0 0 25px rgba(49, 128, 184, 0.3);
+}
+
+.settings-title {
+    font-size: 32px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: #e2eeff;
+}
+
+.settings-description {
+    margin: 15px 0 30px;
+    color: #6ca4cf;
+}
+
+.difficulty-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.difficulty-button {
+    min-width: 130px;
+    padding: 15px 25px;
+    background: #03131f;
+    border: 2px solid #3180b8;
+    color: #8fc6ee;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.difficulty-button.selected {
+    border-color: #65ff91;
+    color: #65ff91;
+    box-shadow: 0 0 10px rgba(101, 255, 145, 0.4);
+}
+
+/* =========================================================
+   SEGUNDO JUEGO - FLECHAS
+========================================================= */
+
+.arrow-game-content {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.countdown {
+    font-size: 80px;
+    color: #ff526f;
+    font-weight: bold;
+    text-shadow: 0 0 15px rgba(255, 82, 111, 0.8);
+}
+
+.arrow-row {
+    width: 96%;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.arrow-box {
+    width: 65px;
+    height: 65px;
+    flex-shrink: 1;
+    border: 2px solid #3180b8;
+    background: rgba(12, 46, 73, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 37px;
+    font-weight: bold;
+    color: #e7f1ff;
+    box-shadow: 0 0 6px rgba(70, 170, 255, 0.7);
+}
+
+.arrow-box.current {
+    border-color: #65ff91;
+    color: #65ff91;
+    box-shadow: 0 0 15px rgba(101, 255, 145, 0.7);
+}
+
+.arrow-box.completed {
+    opacity: 0.3;
+    border-color: #238b4e;
+}
+
+.arrow-information {
+    margin-top: 35px;
+    font-size: 18px;
+    color: #87bce5;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    color: #6ca4cf;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width: 850px) {
+
+    .game-container {
+        top: 1vh;
+        left: 1vw;
+        width: 98vw;
+        height: 98vh;
+        padding: 15px;
+    }
+
+    .controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .arrow-box {
+        width: 45px;
+        height: 50px;
+        font-size: 27px;
+    }
+
+    .difficulty-options {
+        flex-direction: column;
+    }
+
+    .status-panel {
+        margin-right: 65px;
+    }
+}
+
+
+.nav-button {
+    width: auto;
+    min-width: 72px;
+    padding: 0 12px;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+<div class="game-container">
+
+    <!-- NAVEGACIÓN -->
+
+    <div class="top-navigation">
+        <button id="navButton" class="nav-button">MENU</button>
+    </div>
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div>
+
+            <div class="system-user">
+                <span class="online-dot"></span>
+                LAFAUNA_OS
+            </div>
+
+            <div class="title">RED INTERNA</div>
+
+        </div>
+
+        <div class="status-panel">
+
+            <div class="status-tags">
+
+                <span id="gameTag" class="tag">ARROWS</span>
+
+                <span class="tag tag-live">
+                    LIVE
+                </span>
+
+            </div>
+
+            <div class="score-line" style="visibility: hidden;">
+
+                <span id="score" class="score">
+                    0/40
+                </span>
+
+                <span id="hearts" class="hearts">
+                    ♥ ♥ ♥
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    
+<!-- =====================================================
+         PÁGINA 2
+    ====================================================== -->
+
+    <div id="arrowsPage" class="page active">
+
+        <section class="controls">
+
+            <div class="control-group">
+                <span>GAME MODE</span>
+                <span class="control-value">SEQUENCE</span>
+            </div>
+
+        </section>
+
+        <main class="game-area">
+
+            <!-- AJUSTES -->
+
+            <div id="arrowSettings" class="arrow-settings">
+
+                <div class="settings-box">
+
+                    <div class="settings-title">
+                        CONFIGURACIÓN
+                    </div>
+
+                    <div class="settings-description">
+                        SELECCIONA EL NIVEL DE DIFICULTAD
+                    </div>
+
+                    <div class="difficulty-options">
+
+                        <button
+                            class="difficulty-button selected"
+                            data-count="5"
+                            data-time="12"
+                        >
+                            FÁCIL
+                            <br>
+                            5 FLECHAS
+                            <br>
+                            12S
+                        </button>
+
+                        <button
+                            class="difficulty-button"
+                            data-count="10"
+                            data-time="10"
+                        >
+                            MEDIO
+                            <br>
+                            10 FLECHAS
+                            <br>
+                            10S
+                        </button>
+
+                        <button
+                            class="difficulty-button"
+                            data-count="15"
+                            data-time="8"
+                        >
+                            DIFÍCIL
+                            <br>
+                            15 FLECHAS
+                            <br>
+                            8S
+                        </button>
+
+                    </div>
+
+                    <button id="arrowStartButton" class="start-button">
+                        START
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- JUEGO -->
+
+            <div id="arrowGameContent" class="arrow-game-content">
+
+                <div id="countdown" class="countdown"></div>
+
+                <div id="arrowRow" class="arrow-row"></div>
+
+                <div id="arrowInformation" class="arrow-information"></div>
+
+            </div>
+
+            <!-- FINAL -->
+
+            <div id="arrowEndScreen" class="end-screen">
+
+                <div id="arrowEndTitle" class="end-title"></div>
+
+                <div id="arrowEndMessage" class="end-message"></div>
+
+                <button id="arrowRestartButton" class="restart-button">
+                    REINICIAR SISTEMA
+                </button>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    
+<!-- FOOTER -->
+
+    <footer class="footer">
+
+        <span>
+            ZOOM: C$ROB:AMMU_ROOM:NO_MOROS
+        </span>
+
+        <span>
+            V0.8 // SECURE CONNECTION
+        </span>
+
+    </footer>
+
+
+</div>
+<script>
+const navButton = document.getElementById("navButton");
+navButton.addEventListener("click", () => {
+    window.location.href = "index.html";
+});
+/* =========================================================
+   JUEGO DE FLECHAS - ELEMENTOS
+========================================================= */
+
+const arrowSettings =
+    document.getElementById("arrowSettings");
+
+const arrowStartButton =
+    document.getElementById("arrowStartButton");
+
+const arrowGameContent =
+    document.getElementById("arrowGameContent");
+
+const arrowRow =
+    document.getElementById("arrowRow");
+
+const countdown =
+    document.getElementById("countdown");
+
+const arrowInformation =
+    document.getElementById("arrowInformation");
+
+const arrowEndScreen =
+    document.getElementById("arrowEndScreen");
+
+const arrowEndTitle =
+    document.getElementById("arrowEndTitle");
+
+const arrowEndMessage =
+    document.getElementById("arrowEndMessage");
+
+const arrowRestartButton =
+    document.getElementById("arrowRestartButton");
+
+const difficultyButtons =
+    document.querySelectorAll(".difficulty-button");
+
+
+/* =========================================================
+   DIRECCIONES
+========================================================= */
+
+const direcciones = [
+
+    {
+        key: "ArrowUp",
+        symbol: "↑"
+    },
+
+    {
+        key: "ArrowDown",
+        symbol: "↓"
+    },
+
+    {
+        key: "ArrowLeft",
+        symbol: "←"
+    },
+
+    {
+        key: "ArrowRight",
+        symbol: "→"
+    }
+
+];
+
+
+/* =========================================================
+   VARIABLES JUEGO FLECHAS
+========================================================= */
+
+let cantidadFlechas = 5;
+
+let tiempoPorRonda = 12;
+
+let tiempoRestante = 12;
+
+let secuenciaActual = [];
+
+let indiceActual = 0;
+
+let rondaActual = 1;
+
+let jugandoFlechas = false;
+
+let intervaloTiempo = null;
+
+let intervaloCuentaAtras = null;
+
+let timeoutSiguienteRonda = null;
+
+
+/* =========================================================
+   SELECCIONAR DIFICULTAD
+========================================================= */
+
+difficultyButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        difficultyButtons.forEach(
+
+            otroBoton =>
+                otroBoton.classList.remove("selected")
+
+        );
+
+        button.classList.add("selected");
+
+        cantidadFlechas =
+            Number(button.dataset.count);
+
+        tiempoPorRonda =
+            Number(button.dataset.time);
+
+    });
+
+});
+
+
+/* =========================================================
+   GENERAR SECUENCIA
+========================================================= */
+
+function generarSecuencia() {
+
+    secuenciaActual = [];
+
+    for (
+        let i = 0;
+        i < cantidadFlechas;
+        i++
+    ) {
+
+        const direccionAleatoria =
+            direcciones[
+                Math.floor(
+                    Math.random() *
+                    direcciones.length
+                )
+            ];
+
+        secuenciaActual.push(
+            direccionAleatoria
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MOSTRAR SECUENCIA
+========================================================= */
+
+function mostrarSecuencia() {
+
+    arrowRow.innerHTML = "";
+
+    secuenciaActual.forEach(
+
+        (direccion, indice) => {
+
+            const caja =
+                document.createElement("div");
+
+            caja.className =
+                "arrow-box";
+
+            caja.textContent =
+                direccion.symbol;
+
+            if (indice === 0) {
+
+                caja.classList.add(
+                    "current"
+                );
+
+            }
+
+            arrowRow.appendChild(caja);
+
+        }
+
+    );
+
+}
+
+
+/* =========================================================
+   INFORMACIÓN
+========================================================= */
+
+function actualizarInformacionFlechas() {
+
+    if (!jugandoFlechas) {
+        return;
+    }
+
+    arrowInformation.textContent =
+
+        `RONDA ${rondaActual}/3 // ` +
+
+        `FLECHA ${indiceActual + 1}/${cantidadFlechas} // ` +
+
+        `TIEMPO ${tiempoRestante.toFixed(1)}S`;
+
+}
+
+
+/* =========================================================
+   CRONÓMETRO
+========================================================= */
+
+function iniciarCronometro() {
+
+    clearInterval(intervaloTiempo);
+
+    tiempoRestante = tiempoPorRonda;
+
+    const tiempoInicio = performance.now();
+
+    intervaloTiempo = setInterval(() => {
+
+        if (!jugandoFlechas) {
+            return;
+        }
+
+        const tiempoTranscurrido =
+            (performance.now() - tiempoInicio) / 1000;
+
+        tiempoRestante = Math.max(
+            0,
+            tiempoPorRonda - tiempoTranscurrido
+        );
+
+        actualizarInformacionFlechas();
+
+        if (tiempoRestante <= 0) {
+
+            clearInterval(intervaloTiempo);
+
+            intervaloTiempo = null;
+
+            terminarJuegoFlechas(
+                false,
+                "TIME OUT"
+            );
+        }
+
+    }, 50);
+}
+
+/* =========================================================
+   INICIAR JUEGO DE FLECHAS
+========================================================= */
+
+function iniciarJuegoFlechas() {
+
+    limpiarProcesosFlechas();
+
+    arrowSettings.style.display = "none";
+
+    arrowEndScreen.style.display = "none";
+
+    arrowGameContent.style.display = "flex";
+
+    arrowRow.innerHTML = "";
+
+    arrowInformation.textContent = "";
+
+    countdown.textContent = "";
+
+    rondaActual = 1;
+
+    indiceActual = 0;
+
+    jugandoFlechas = false;
+
+    iniciarCuentaAtrasInicial();
+}
+
+/* =========================================================
+   CUENTA ATRÁS SOLO AL PRINCIPIO
+========================================================= */
+
+function iniciarCuentaAtrasInicial() {
+
+    clearInterval(intervaloCuentaAtras);
+
+    let numero = 3;
+
+    countdown.textContent = numero;
+
+    intervaloCuentaAtras = setInterval(() => {
+
+        numero--;
+
+        if (numero > 0) {
+
+            countdown.textContent = numero;
+
+        } else {
+
+            clearInterval(intervaloCuentaAtras);
+
+            intervaloCuentaAtras = null;
+
+            countdown.textContent = "";
+
+            /* GENERAMOS LA PRIMERA RONDA */
+
+            iniciarRonda();
+
+            /* EL TIEMPO EMPIEZA UNA SOLA VEZ */
+
+            iniciarCronometro();
+        }
+
+    }, 1000);
+}
+
+
+/* =========================================================
+   INICIAR RONDA
+========================================================= */
+
+function iniciarRonda() {
+
+    generarSecuencia();
+
+    indiceActual = 0;
+
+    mostrarSecuencia();
+
+    jugandoFlechas = true;
+
+    actualizarInformacionFlechas();
+}
+
+
+/* =========================================================
+   COMPROBAR FLECHA
+========================================================= */
+
+function comprobarFlecha(tecla) {
+
+    if (!jugandoFlechas) {
+        return;
+    }
+
+    const direccionCorrecta =
+        secuenciaActual[indiceActual];
+
+    /* FALLO */
+
+    if (
+        !direccionCorrecta ||
+        tecla !== direccionCorrecta.key
+    ) {
+
+        terminarJuegoFlechas(
+            false,
+            "SEQUENCE ERROR"
+        );
+
+        return;
+    }
+
+    const cajas =
+        arrowRow.querySelectorAll(".arrow-box");
+
+    /* MARCAR FLECHA COMO COMPLETADA */
+
+    cajas[indiceActual]
+        .classList
+        .remove("current");
+
+    cajas[indiceActual]
+        .classList
+        .add("completed");
+
+    indiceActual++;
+
+    /* =====================================================
+       RONDA COMPLETADA
+    ====================================================== */
+
+    if (
+        indiceActual >=
+        secuenciaActual.length
+    ) {
+
+        jugandoFlechas = false;
+
+        /* =================================================
+           LAS 3 RONDAS ESTÁN COMPLETADAS
+        ================================================= */
+
+        if (rondaActual >= 3) {
+
+            terminarJuegoFlechas(true);
+
+            return;
+        }
+
+        /* =================================================
+           SIGUIENTE RONDA
+        ================================================= */
+
+        rondaActual++;
+
+        /*
+            La siguiente secuencia aparece
+            INMEDIATAMENTE.
+
+            No hay timeout.
+            No hay espera de 1 segundo.
+            No se reinicia el tiempo.
+        */
+
+        iniciarRonda();
+
+        return;
+    }
+
+    /* =====================================================
+       SIGUIENTE FLECHA
+    ====================================================== */
+
+    cajas[indiceActual]
+        .classList
+        .add("current");
+
+    actualizarInformacionFlechas();
+}
+
+
+/* =========================================================
+   TERMINAR JUEGO DE FLECHAS
+========================================================= */
+
+function terminarJuegoFlechas(
+    victoria,
+    motivo = ""
+) {
+
+    jugandoFlechas = false;
+
+    limpiarProcesosFlechas();
+
+    arrowEndScreen.style.display =
+        "flex";
+
+    if (victoria) {
+
+        arrowEndTitle.textContent =
+            "ACCESS GRANTED";
+
+        arrowEndTitle.style.color =
+            "#65ff91";
+
+        arrowEndMessage.textContent =
+            "3/3 SECUENCIAS COMPLETADAS";
+
+    }
+
+    else {
+
+        if (motivo === "TIME OUT") {
+
+            arrowEndTitle.textContent =
+                "TIME OUT";
+
+            arrowEndMessage.textContent =
+                `TIEMPO AGOTADO // RONDA ${rondaActual}`;
+
+        }
+
+        else {
+
+            arrowEndTitle.textContent =
+                "SEQUENCE FAILED";
+
+            arrowEndMessage.textContent =
+                `ERROR DE SECUENCIA // RONDA ${rondaActual}`;
+
+        }
+
+        arrowEndTitle.style.color =
+            "#ff526f";
+
+    }
+
+}
+
+
+/* =========================================================
+   LIMPIAR PROCESOS
+========================================================= */
+
+function limpiarProcesosFlechas() {
+
+    clearInterval(intervaloTiempo);
+
+    clearInterval(intervaloCuentaAtras);
+
+    clearTimeout(timeoutSiguienteRonda);
+
+    intervaloTiempo = null;
+
+    intervaloCuentaAtras = null;
+
+    timeoutSiguienteRonda = null;
+
+}
+
+
+/* =========================================================
+   REINICIAR FLECHAS
+========================================================= */
+
+function reiniciarJuegoFlechas() {
+
+    jugandoFlechas = false;
+
+    limpiarProcesosFlechas();
+
+    arrowGameContent.style.display =
+        "none";
+
+    arrowEndScreen.style.display =
+        "none";
+
+    arrowSettings.style.display =
+        "flex";
+
+    arrowRow.innerHTML =
+        "";
+
+    countdown.textContent =
+        "";
+
+    arrowInformation.textContent =
+        "";
+
+    rondaActual = 1;
+
+    indiceActual = 0;
+
+}
+
+
+/* =========================================================
+   EVENTOS SEGUNDO JUEGO
+========================================================= */
+
+arrowStartButton.addEventListener(
+    "click",
+    iniciarJuegoFlechas
+);
+
+
+arrowRestartButton.addEventListener(
+    "click",
+    reiniciarJuegoFlechas
+);
+
+
+
+/* =========================================================
+   EVENTOS GENERALES DEL TECLADO
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+        if (
+            [
+                "ArrowUp",
+                "ArrowDown",
+                "ArrowLeft",
+                "ArrowRight"
+            ].includes(event.key)
+        ) {
+            event.preventDefault();
+            comprobarFlecha(event.key);
+        }
+    }
+);
+</script>
+</body>
+</html>
