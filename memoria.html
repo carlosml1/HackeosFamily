@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>RED INTERNA // MEMORY GRID</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            min-height: 100%;
+            background: #020b13;
+            color: #d7e8ff;
+            font-family: "Courier New", monospace;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 18px;
+        }
+
+        button,
+        input {
+            font-family: inherit;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+
+        /* =========================================
+           CONTENEDOR PRINCIPAL
+        ========================================= */
+
+        .game-container {
+
+            width: 100%;
+            min-height: calc(100vh - 36px);
+
+            border: 1px solid #1788c9;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(5, 30, 49, 0.96),
+                    rgba(2, 17, 29, 0.98)
+                );
+
+            box-shadow:
+                0 0 30px rgba(0, 130, 220, 0.12);
+
+            padding: 28px;
+
+            display: flex;
+            flex-direction: column;
+
+        }
+
+
+        /* =========================================
+           CABECERA
+        ========================================= */
+
+        .topbar {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: flex-start;
+
+            gap: 20px;
+
+        }
+
+
+        .brand-small {
+
+            color: #8fcaff;
+
+            font-size: 13px;
+
+            letter-spacing: 1px;
+
+        }
+
+
+        .status-dot {
+
+            display: inline-block;
+
+            width: 9px;
+
+            height: 9px;
+
+            margin-right: 10px;
+
+            border-radius: 50%;
+
+            background: #57ff8c;
+
+            box-shadow:
+                0 0 12px #57ff8c;
+
+        }
+
+
+        h1 {
+
+            margin:
+
+                22px
+                0
+                0;
+
+            font-size: clamp(28px, 4vw, 52px);
+
+            letter-spacing: 4px;
+
+            text-shadow:
+                0 0 12px rgba(180, 215, 255, 0.6);
+
+        }
+
+
+        .top-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+        }
+
+
+        .tag {
+
+            border: 1px solid #286f9b;
+
+            padding: 5px 12px;
+
+            font-size: 12px;
+
+            color: #a8d5ff;
+
+        }
+
+
+        .live {
+
+            border-color: #36d77a;
+
+            color: #65ff99;
+
+        }
+
+
+        .back-button {
+
+            width: 45px;
+
+            height: 38px;
+
+            border: 1px solid #1788c9;
+
+            background: #031522;
+
+            color: #62ff94;
+
+            font-size: 20px;
+
+            cursor: pointer;
+
+        }
+
+
+        .back-button:hover {
+
+            background: #09283d;
+
+            box-shadow:
+                0 0 15px rgba(80, 255, 145, 0.2);
+
+        }
+
+
+        /* =========================================
+           INFORMACIÓN
+        ========================================= */
+
+        .game-info {
+
+            margin-top: 20px;
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 35px;
+
+            color: #8fcaff;
+
+            font-size: 14px;
+
+        }
+
+
+        .game-info strong {
+
+            color: #63ff96;
+
+        }
+
+
+        /* =========================================
+           ÁREA DEL JUEGO
+        ========================================= */
+
+        .game-area {
+
+            position: relative;
+
+            flex: 1;
+
+            min-height: 600px;
+
+            margin-top: 18px;
+
+            border: 1px solid #286f9b;
+
+            background:
+
+                linear-gradient(
+                    rgba(0, 15, 25, 0.94),
+                    rgba(0, 15, 25, 0.94)
+                ),
+
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(50, 150, 220, 0.03) 4px
+                );
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+        }
+
+
+        /* =========================================
+           PANTALLAS INTERNAS
+        ========================================= */
+
+        .screen {
+
+            width: 100%;
+
+            height: 100%;
+
+            min-height: 600px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 30px;
+
+        }
+
+
+        .phase-title {
+
+            color: #dceaff;
+
+            font-size: clamp(24px, 4vw, 50px);
+
+            letter-spacing: 4px;
+
+            text-align: center;
+
+            text-shadow:
+                0 0 15px rgba(180, 220, 255, 0.4);
+
+        }
+
+
+        .phase-subtitle {
+
+            margin-top: 25px;
+
+            color: #63ff96;
+
+            font-size: 16px;
+
+            letter-spacing: 2px;
+
+            text-align: center;
+
+        }
+
+
+        /* =========================================
+           BOTÓN START
+        ========================================= */
+
+        .start-button {
+
+            margin-top: 40px;
+
+            min-width: 260px;
+
+            padding: 18px 35px;
+
+            border: 2px solid #63ff96;
+
+            background: #03131f;
+
+            color: #63ff96;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            letter-spacing: 3px;
+
+            cursor: pointer;
+
+        }
+
+
+        .start-button:hover {
+
+            background: #08291f;
+
+            box-shadow:
+                0 0 20px rgba(99, 255, 150, 0.25);
+
+        }
+
+
+        /* =========================================
+           CUADRÍCULA
+        ========================================= */
+
+        .grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(10, 42px);
+
+            grid-template-rows:
+                repeat(10, 42px);
+
+            gap: 3px;
+
+            padding: 20px;
+
+            background: #020a10;
+
+            border: 1px solid #102a38;
+
+            box-shadow:
+                0 0 25px rgba(0, 0, 0, 0.8);
+
+        }
+
+
+        .cell {
+
+            width: 42px;
+
+            height: 42px;
+
+            background: #07131b;
+
+            border: 1px solid #0d202b;
+
+        }
+
+
+        .cell.orange {
+
+            background: #9b572b;
+
+            border-color: #e38b49;
+
+            box-shadow:
+                inset 0 0 10px rgba(255, 150, 60, 0.25);
+
+        }
+
+
+        .cell.green {
+
+            background: #747c1d;
+
+            border-color: #c4d536;
+
+            box-shadow:
+                inset 0 0 10px rgba(200, 230, 50, 0.25);
+
+        }
+
+
+        .cell.blue {
+
+            background: #456d78;
+
+            border-color: #73a9b9;
+
+            box-shadow:
+                inset 0 0 10px rgba(100, 190, 220, 0.25);
+
+        }
+
+
+        /* =========================================
+           PREGUNTA
+        ========================================= */
+
+        .question {
+
+            font-size: clamp(20px, 3vw, 35px);
+
+            color: #dceaff;
+
+            text-align: center;
+
+            letter-spacing: 2px;
+
+            margin-bottom: 35px;
+
+        }
+
+
+        .answer-input {
+
+            width: min(400px, 90%);
+
+            height: 70px;
+
+            border: 2px solid #63ff96;
+
+            outline: none;
+
+            background: #020d15;
+
+            color: white;
+
+            text-align: center;
+
+            font-size: 30px;
+
+            font-weight: bold;
+
+        }
+
+
+        .answer-input:focus {
+
+            box-shadow:
+                0 0 20px rgba(99, 255, 150, 0.25);
+
+        }
+
+
+        .send-button {
+
+            margin-top: 20px;
+
+            width: min(400px, 90%);
+
+            height: 55px;
+
+            border: 1px solid #1788c9;
+
+            background: #061c2b;
+
+            color: #8fcaff;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+        }
+
+
+        .send-button:hover {
+
+            border-color: #63ff96;
+
+            color: #63ff96;
+
+        }
+
+
+        /* =========================================
+           RESULTADOS
+        ========================================= */
+
+        .success {
+
+            color: #63ff96;
+
+            text-shadow:
+                0 0 15px rgba(99, 255, 150, 0.5);
+
+        }
+
+
+        .error {
+
+            color: #ff5875;
+
+            text-shadow:
+                0 0 15px rgba(255, 80, 110, 0.5);
+
+        }
+
+
+        /* =========================================
+           BARRA DE TIEMPO
+        ========================================= */
+
+        .timer-container {
+
+            height: 16px;
+
+            margin-top: 18px;
+
+            border: 1px solid #24495f;
+
+            background: #03101a;
+
+            overflow: hidden;
+
+        }
+
+
+        .timer-bar {
+
+            width: 100%;
+
+            height: 100%;
+
+            background: #ff8c32;
+
+            transition: width 0.1s linear;
+
+        }
+
+
+        /* =========================================
+           FOOTER
+        ========================================= */
+
+        .footer {
+
+            margin-top: 18px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            color: #5894c0;
+
+            font-size: 12px;
+
+        }
+
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media (
+            max-width: 650px
+        ) {
+
+            body {
+
+                padding: 5px;
+
+            }
+
+
+            .game-container {
+
+                min-height:
+                    calc(100vh - 10px);
+
+                padding: 15px;
+
+            }
+
+
+            .grid {
+
+                grid-template-columns:
+                    repeat(10, 28px);
+
+                grid-template-rows:
+                    repeat(10, 28px);
+
+                gap: 2px;
+
+                padding: 10px;
+
+            }
+
+
+            .cell {
+
+                width: 28px;
+
+                height: 28px;
+
+            }
+
+
+            .game-info {
+
+                justify-content:
+                    space-between;
+
+                gap: 10px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="game-container">
+
+
+    <!-- =========================================
+         CABECERA
+    ========================================== -->
+
+    <div class="topbar">
+
+
+        <div>
+
+            <div class="brand-small">
+
+                <span class="status-dot"></span>
+
+                LAFAUNA_OS
+
+            </div>
+
+
+            <h1>
+
+                MEMORY GRID
+
+            </h1>
+
+        </div>
+
+
+        <div class="top-right">
+
+            <span class="tag">
+
+                MEMORY_TEST
+
+            </span>
+
+            <span class="tag live">
+
+                LIVE
+
+            </span>
+
+            <button
+                class="back-button"
+                id="backButton"
+                title="Volver al menú"
+            >
+
+                ←
+
+            </button>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================================
+         INFORMACIÓN
+    ========================================== -->
+
+    <div class="game-info">
+
+        <span>
+
+            ROUND
+
+            <strong id="roundText">
+
+                0/5
+
+            </strong>
+
+        </span>
+
+
+        <span>
+
+            TIME
+
+            <strong id="timeText">
+
+                5.0S
+
+            </strong>
+
+        </span>
+
+    </div>
+
+
+    <!-- =========================================
+         JUEGO
+    ========================================== -->
+
+    <main class="game-area">
+
+
+        <!-- INICIO -->
+
+        <section
+            class="screen"
+            id="startScreen"
+        >
+
+            <div class="phase-title">
+
+                MEMORY PROTOCOL
+
+            </div>
+
+            <div class="phase-subtitle">
+
+                ANALIZA // RECUERDA // RESPONDE
+
+            </div>
+
+            <button
+                class="start-button"
+                id="startButton"
+            >
+
+                START
+
+            </button>
+
+        </section>
+
+
+        <!-- READY -->
+
+        <section
+            class="screen hidden"
+            id="readyScreen"
+        >
+
+            <div class="phase-title">
+
+                GET READY
+
+            </div>
+
+            <div class="phase-subtitle">
+
+                MEMORY SEQUENCE INITIALIZING
+
+            </div>
+
+        </section>
+
+
+        <!-- MEMORIZAR -->
+
+        <section
+            class="screen hidden"
+            id="rememberScreen"
+        >
+
+            <div class="phase-title">
+
+                REMEMBER
+
+            </div>
+
+
+            <div
+                class="grid"
+                id="memoryGrid"
+            ></div>
+
+
+            <div class="phase-subtitle">
+
+                <span id="rememberRound">
+
+                    1/5
+
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- RESPONDER -->
+
+        <section
+            class="screen hidden"
+            id="answerScreen"
+        >
+
+            <div
+                class="question"
+                id="questionText"
+            >
+
+                HOW MANY BLUE TILES WERE THERE?
+
+            </div>
+
+
+            <input
+                id="answerInput"
+                class="answer-input"
+                type="number"
+                min="0"
+                autocomplete="off"
+            >
+
+
+            <button
+                class="send-button"
+                id="sendButton"
+            >
+
+                ENTER // SEND
+
+            </button>
+
+
+            <div class="phase-subtitle">
+
+                <span id="answerRound">
+
+                    1/5
+
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- VICTORIA -->
+
+        <section
+            class="screen hidden"
+            id="winScreen"
+        >
+
+            <div class="phase-title success">
+
+                ACCESS GRANTED
+
+            </div>
+
+            <div class="phase-subtitle">
+
+                MEMORY PROTOCOL COMPLETED
+
+            </div>
+
+            <button
+                class="start-button"
+                id="restartWinButton"
+            >
+
+                RESTART
+
+            </button>
+
+        </section>
+
+
+        <!-- DERROTA -->
+
+        <section
+            class="screen hidden"
+            id="loseScreen"
+        >
+
+            <div class="phase-title error">
+
+                ACCESS DENIED
+
+            </div>
+
+            <div
+                class="phase-subtitle"
+                id="loseReason"
+            >
+
+                MEMORY PROTOCOL FAILED
+
+            </div>
+
+            <button
+                class="start-button"
+                id="restartLoseButton"
+            >
+
+                RETRY
+
+            </button>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =========================================
+         TEMPORIZADOR
+    ========================================== -->
+
+    <div class="timer-container">
+
+        <div
+            class="timer-bar"
+            id="timerBar"
+        ></div>
+
+    </div>
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <footer class="footer">
+
+        <span>
+
+            ZOOM: C$ROB:MEMORY_ROOM
+
+        </span>
+
+        <span>
+
+            V1.0 // SECURE CONNECTION
+
+        </span>
+
+    </footer>
+
+
+</div>
+
+
+<script>
+
+
+/* =========================================================
+   CONFIGURACIÓN
+========================================================= */
+
+const TOTAL_ROUNDS = 5;
+
+const READY_TIME = 5000;
+
+const REMEMBER_TIME = 5000;
+
+const ANSWER_TIME = 5000;
+
+const GRID_SIZE = 100;
+
+
+const COLORS = [
+
+    {
+        name: "ORANGE",
+        className: "orange"
+    },
+
+    {
+        name: "GREEN",
+        className: "green"
+    },
+
+    {
+        name: "BLUE",
+        className: "blue"
+    }
+
+];
+
+
+/* =========================================================
+   ELEMENTOS
+========================================================= */
+
+const screens =
+    document.querySelectorAll(".screen");
+
+
+const startScreen =
+    document.getElementById("startScreen");
+
+const readyScreen =
+    document.getElementById("readyScreen");
+
+const rememberScreen =
+    document.getElementById("rememberScreen");
+
+const answerScreen =
+    document.getElementById("answerScreen");
+
+const winScreen =
+    document.getElementById("winScreen");
+
+const loseScreen =
+    document.getElementById("loseScreen");
+
+
+const startButton =
+    document.getElementById("startButton");
+
+const restartWinButton =
+    document.getElementById("restartWinButton");
+
+const restartLoseButton =
+    document.getElementById("restartLoseButton");
+
+const backButton =
+    document.getElementById("backButton");
+
+
+const memoryGrid =
+    document.getElementById("memoryGrid");
+
+const questionText =
+    document.getElementById("questionText");
+
+const answerInput =
+    document.getElementById("answerInput");
+
+const sendButton =
+    document.getElementById("sendButton");
+
+
+const roundText =
+    document.getElementById("roundText");
+
+const rememberRound =
+    document.getElementById("rememberRound");
+
+const answerRound =
+    document.getElementById("answerRound");
+
+const timeText =
+    document.getElementById("timeText");
+
+const timerBar =
+    document.getElementById("timerBar");
+
+const loseReason =
+    document.getElementById("loseReason");
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let currentRound = 0;
+
+let currentCounts = {
+
+    ORANGE: 0,
+
+    GREEN: 0,
+
+    BLUE: 0
+
+};
+
+
+let questionColor = null;
+
+let gameActive = false;
+
+let answerActive = false;
+
+let timeoutId = null;
+
+let timerInterval = null;
+
+
+/* =========================================================
+   MOSTRAR PANTALLA
+========================================================= */
+
+function showScreen(screen) {
+
+    screens.forEach(element => {
+
+        element.classList.add("hidden");
+
+    });
+
+
+    screen.classList.remove("hidden");
+
+}
+
+
+/* =========================================================
+   LIMPIAR TEMPORIZADORES
+========================================================= */
+
+function clearTimers() {
+
+    clearTimeout(timeoutId);
+
+    clearInterval(timerInterval);
+
+}
+
+
+/* =========================================================
+   TEMPORIZADOR VISUAL
+========================================================= */
+
+function startVisualTimer(
+    duration,
+    onFinish
+) {
+
+    clearTimers();
+
+
+    const startTime =
+        performance.now();
+
+
+    timerBar.style.width =
+        "100%";
+
+
+    function updateTimer() {
+
+        const elapsed =
+            performance.now()
+            -
+            startTime;
+
+
+        const remaining =
+            Math.max(
+                0,
+                duration - elapsed
+            );
+
+
+        const percentage =
+            (
+                remaining
+                /
+                duration
+            )
+            *
+            100;
+
+
+        timerBar.style.width =
+            percentage + "%";
+
+
+        timeText.textContent =
+            (
+                remaining / 1000
+            )
+            .toFixed(1)
+            +
+            "S";
+
+
+        if (remaining <= 0) {
+
+            clearInterval(
+                timerInterval
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    updateTimer();
+
+
+    timerInterval =
+        setInterval(
+            updateTimer,
+            50
+        );
+
+
+    timeoutId =
+        setTimeout(
+            () => {
+
+                clearInterval(
+                    timerInterval
+                );
+
+                timerBar.style.width =
+                    "0%";
+
+                timeText.textContent =
+                    "0.0S";
+
+                onFinish();
+
+            },
+            duration
+        );
+
+}
+
+
+/* =========================================================
+   CREAR CUADRÍCULA
+========================================================= */
+
+function createGrid() {
+
+    memoryGrid.innerHTML = "";
+
+
+    currentCounts = {
+
+        ORANGE: 0,
+
+        GREEN: 0,
+
+        BLUE: 0
+
+    };
+
+
+    /*
+        Cantidad total aleatoria de cuadrados coloreados.
+
+        Mínimo: 12
+        Máximo: 25
+    */
+
+    const totalColored =
+        randomNumber(
+            12,
+            25
+        );
+
+
+    /*
+        Creamos array de posiciones:
+        0, 1, 2 ... 99
+
+        Después lo mezclamos.
+    */
+
+    const positions =
+        Array.from(
+            {
+                length:
+                    GRID_SIZE
+            },
+            (_, index) =>
+                index
+        );
+
+
+    shuffleArray(
+        positions
+    );
+
+
+    /*
+        Elegimos las primeras posiciones
+        según totalColored.
+    */
+
+    const coloredPositions =
+        positions.slice(
+            0,
+            totalColored
+        );
+
+
+    /*
+        Creamos las 100 celdas.
+    */
+
+    for (
+        let index = 0;
+        index < GRID_SIZE;
+        index++
+    ) {
+
+        const cell =
+            document.createElement(
+                "div"
+            );
+
+
+        cell.className =
+            "cell";
+
+
+        if (
+            coloredPositions.includes(
+                index
+            )
+        ) {
+
+            const color =
+                COLORS[
+                    randomNumber(
+                        0,
+                        COLORS.length - 1
+                    )
+                ];
+
+
+            cell.classList.add(
+                color.className
+            );
+
+
+            currentCounts[
+                color.name
+            ]++;
+
+        }
+
+
+        memoryGrid.appendChild(
+            cell
+        );
+
+    }
+
+
+    console.log(
+        "CUADRADOS GENERADOS:",
+        currentCounts
+    );
+
+}
+
+
+/* =========================================================
+   NÚMERO ALEATORIO
+========================================================= */
+
+function randomNumber(
+    min,
+    max
+) {
+
+    return Math.floor(
+        Math.random()
+        *
+        (
+            max - min + 1
+        )
+    )
+    +
+    min;
+
+}
+
+
+/* =========================================================
+   MEZCLAR ARRAY
+========================================================= */
+
+function shuffleArray(array) {
+
+    for (
+        let i = array.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random()
+                *
+                (
+                    i + 1
+                )
+            );
+
+
+        [
+            array[i],
+            array[j]
+        ]
+        =
+        [
+            array[j],
+            array[i]
+        ];
+
+    }
+
+}
+
+
+/* =========================================================
+   INICIAR JUEGO
+========================================================= */
+
+function startGame() {
+
+    clearTimers();
+
+
+    currentRound = 0;
+
+    gameActive = true;
+
+    answerActive = false;
+
+
+    roundText.textContent =
+        "0/5";
+
+
+    startReadyPhase();
+
+}
+
+
+/* =========================================================
+   GET READY
+========================================================= */
+
+function startReadyPhase() {
+
+    if (!gameActive) {
+
+        return;
+
+    }
+
+
+    showScreen(
+        readyScreen
+    );
+
+
+    startVisualTimer(
+        READY_TIME,
+        startRound
+    );
+
+}
+
+
+/* =========================================================
+   INICIAR RONDA
+========================================================= */
+
+function startRound() {
+
+    if (!gameActive) {
+
+        return;
+
+    }
+
+
+    currentRound++;
+
+
+    roundText.textContent =
+        `${currentRound}/${TOTAL_ROUNDS}`;
+
+
+    rememberRound.textContent =
+        `${currentRound}/${TOTAL_ROUNDS}`;
+
+
+    answerRound.textContent =
+        `${currentRound}/${TOTAL_ROUNDS}`;
+
+
+    createGrid();
+
+
+    showScreen(
+        rememberScreen
+    );
+
+
+    startVisualTimer(
+        REMEMBER_TIME,
+        startQuestion
+    );
+
+}
+
+
+/* =========================================================
+   CREAR PREGUNTA
+========================================================= */
+
+function startQuestion() {
+
+    if (!gameActive) {
+
+        return;
+
+    }
+
+
+    questionColor =
+        COLORS[
+            randomNumber(
+                0,
+                COLORS.length - 1
+            )
+        ];
+
+
+    questionText.textContent =
+        `HOW MANY ${questionColor.name} TILES WERE THERE?`;
+
+
+    answerInput.value = "";
+
+
+    answerActive = true;
+
+
+    showScreen(
+        answerScreen
+    );
+
+
+    answerInput.focus();
+
+
+    startVisualTimer(
+        ANSWER_TIME,
+        () => {
+
+            if (!answerActive) {
+
+                return;
+
+            }
+
+
+            answerActive = false;
+
+
+            loseGame(
+                "TIME EXPIRED // MEMORY FAILURE"
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   COMPROBAR RESPUESTA
+========================================================= */
+
+function checkAnswer() {
+
+    if (
+        !gameActive
+        ||
+        !answerActive
+    ) {
+
+        return;
+
+    }
+
+
+    const answer =
+        Number(
+            answerInput.value
+        );
+
+
+    if (
+        answerInput.value.trim()
+        ===
+        ""
+    ) {
+
+        return;
+
+    }
+
+
+    answerActive = false;
+
+
+    clearTimers();
+
+
+    const correctAnswer =
+        currentCounts[
+            questionColor.name
+        ];
+
+
+    console.log(
+        "RESPUESTA USUARIO:",
+        answer
+    );
+
+    console.log(
+        "RESPUESTA CORRECTA:",
+        correctAnswer
+    );
+
+
+    /* =====================================================
+       RESPUESTA INCORRECTA
+    ====================================================== */
+
+    if (
+        answer !==
+        correctAnswer
+    ) {
+
+        loseGame(
+
+            `WRONG ANSWER // CORRECT: ${correctAnswer}`
+
+        );
+
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       5 RONDAS COMPLETADAS
+    ====================================================== */
+
+    if (
+        currentRound >=
+        TOTAL_ROUNDS
+    ) {
+
+        winGame();
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       SIGUIENTE RONDA DIRECTAMENTE
+    ====================================================== */
+
+    startRound();
+
+}
+
+
+/* =========================================================
+   GANAR
+========================================================= */
+
+function winGame() {
+
+    clearTimers();
+
+    gameActive = false;
+
+    answerActive = false;
+
+    timerBar.style.width =
+        "100%";
+
+    timeText.textContent =
+        "DONE";
+
+    showScreen(
+        winScreen
+    );
+
+}
+
+
+/* =========================================================
+   PERDER
+========================================================= */
+
+function loseGame(reason) {
+
+    clearTimers();
+
+    gameActive = false;
+
+    answerActive = false;
+
+    loseReason.textContent =
+        reason;
+
+    showScreen(
+        loseScreen
+    );
+
+}
+
+
+/* =========================================================
+   EVENTOS
+========================================================= */
+
+startButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+restartWinButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+restartLoseButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+sendButton.addEventListener(
+    "click",
+    checkAnswer
+);
+
+
+answerInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            event.preventDefault();
+
+            checkAnswer();
+
+        }
+
+    }
+);
+
+
+backButton.addEventListener(
+    "click",
+    () => {
+
+        window.location.href =
+            "index.html";
+
+    }
+);
+
+
+</script>
+
+
+</body>
+
+</html>
