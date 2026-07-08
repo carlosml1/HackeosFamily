@@ -483,9 +483,16 @@ button:not(.pattern-card):disabled {
     .dot { width: 15px; height: 15px; }
     .config-grid { grid-template-columns: 1fr; }
 }
+
+.auth-loading {
+    display: none;
+}
 </style>
+
+<script type="module" src="./auth-guard.js"></script>
+
 </head>
-<body>
+<body class="auth-loading">
 <div class="enigma-shell">
     <header class="top-bar">
         <h1>CODIGOS ENIGMA</h1>

@@ -461,9 +461,15 @@
       box-shadow: 0 0 18px rgba(23, 228, 119, 0.38);
       outline: none;
     }
+
+    .auth-loading {
+    display: none;
+    }
   </style>
+
+<script type="module" src="./auth-guard.js"></script>
 </head>
-<body>
+<body class="auth-loading">
   <a class="menu-link" href="index.html">MENU</a>
   <div class="shell">
     <div class="layout">
