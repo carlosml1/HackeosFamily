@@ -1,0 +1,2796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LAFAUNA_OS // THERMITE</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
+    background: #020b13;
+    color: #d7e8ff;
+    font-family: "Courier New", monospace;
+}
+
+body {
+    min-height: 100vh;
+    padding: 18px;
+}
+
+button {
+    font-family: inherit;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
+/* =========================================================
+   CONTENEDOR
+========================================================= */
+
+.game-container {
+    width: 100%;
+    min-height: calc(100vh - 36px);
+
+    border: 1px solid #1788c9;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(5, 30, 49, 0.97),
+            rgba(2, 17, 29, 0.99)
+        );
+
+    box-shadow:
+        0 0 30px rgba(0, 130, 220, 0.12);
+
+    padding: 28px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.brand-small {
+    color: #8fcaff;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.status-dot {
+    display: inline-block;
+
+    width: 9px;
+    height: 9px;
+
+    margin-right: 10px;
+
+    border-radius: 50%;
+
+    background: #57ff8c;
+
+    box-shadow:
+        0 0 12px #57ff8c;
+}
+
+h1 {
+    margin: 22px 0 0;
+
+    font-size: clamp(28px, 4vw, 52px);
+
+    letter-spacing: 4px;
+
+    text-shadow:
+        0 0 12px rgba(180, 215, 255, 0.6);
+}
+
+.top-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tag {
+    border: 1px solid #286f9b;
+
+    padding: 5px 12px;
+
+    font-size: 12px;
+
+    color: #a8d5ff;
+}
+
+.live {
+    border-color: #36d77a;
+    color: #65ff99;
+}
+
+.back-button {
+    width: 45px;
+    height: 38px;
+
+    border: 1px solid #1788c9;
+
+    background: #031522;
+
+    color: #62ff94;
+
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+.back-button:hover {
+    background: #09283d;
+}
+
+
+/* =========================================================
+   ESTADÍSTICAS
+========================================================= */
+
+.stats {
+    margin-top: 20px;
+
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+
+    gap: 35px;
+
+    color: #8fcaff;
+
+    font-size: 14px;
+}
+
+.stats strong {
+    color: #63ff96;
+}
+
+
+/* =========================================================
+   ÁREA PRINCIPAL
+========================================================= */
+
+.game-area {
+    position: relative;
+
+    flex: 1;
+
+    min-height: 620px;
+
+    margin-top: 18px;
+
+    border: 1px solid #286f9b;
+
+    background:
+        linear-gradient(
+            rgba(0, 15, 25, 0.96),
+            rgba(0, 15, 25, 0.96)
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.screen {
+    width: 100%;
+    min-height: 620px;
+
+    padding: 30px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* =========================================================
+   MENÚ
+========================================================= */
+
+.phase-title {
+    color: #dceaff;
+
+    font-size: clamp(25px, 4vw, 48px);
+
+    letter-spacing: 4px;
+
+    text-align: center;
+
+    text-shadow:
+        0 0 15px rgba(180, 220, 255, 0.4);
+}
+
+.phase-subtitle {
+    margin-top: 22px;
+
+    color: #63ff96;
+
+    font-size: 15px;
+
+    letter-spacing: 2px;
+
+    text-align: center;
+}
+
+.instructions {
+    max-width: 800px;
+
+    margin-top: 30px;
+
+    color: #79a9c9;
+
+    font-size: 13px;
+
+    line-height: 1.8;
+
+    text-align: center;
+}
+
+.mode-container {
+    margin-top: 40px;
+
+    display: flex;
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    gap: 15px;
+}
+
+.mode-button {
+    min-width: 190px;
+
+    padding: 20px;
+
+    border: 1px solid #286f9b;
+
+    background: #03131f;
+
+    color: #8fcaff;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+}
+
+.mode-button:hover,
+.mode-button.selected {
+    color: #63ff96;
+
+    border-color: #63ff96;
+
+    box-shadow:
+        0 0 18px rgba(99, 255, 150, 0.15);
+}
+
+.start-button {
+    margin-top: 30px;
+
+    min-width: 260px;
+
+    padding: 18px 35px;
+
+    border: 2px solid #63ff96;
+
+    background: #03131f;
+
+    color: #63ff96;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    cursor: pointer;
+}
+
+.start-button:hover {
+    background: #09251b;
+
+    box-shadow:
+        0 0 20px rgba(99, 255, 150, 0.15);
+}
+
+
+/* =========================================================
+   TABLERO
+========================================================= */
+
+.board {
+    display: grid;
+
+    grid-template-columns: repeat(7, 68px);
+    grid-template-rows: repeat(7, 68px);
+
+    gap: 5px;
+
+    padding: 15px;
+
+    background: #02090e;
+
+    border: 1px solid #173445;
+}
+
+
+/* =========================================================
+   CASILLA NORMAL
+========================================================= */
+
+.tile {
+    position: relative;
+
+    width: 68px;
+    height: 68px;
+
+    border: 1px solid #263944;
+
+    background:
+        linear-gradient(
+            135deg,
+            #243039,
+            #172128
+        );
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    cursor: default;
+
+    user-select: none;
+
+    transition:
+        transform 0.08s,
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.tile::before {
+    content: "×";
+
+    position: absolute;
+
+    top: 4px;
+    left: 6px;
+
+    color: rgba(255,255,255,0.10);
+
+    font-size: 10px;
+}
+
+.tile::after {
+    content: "×";
+
+    position: absolute;
+
+    right: 6px;
+    bottom: 4px;
+
+    color: rgba(255,255,255,0.10);
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   ANIMAL
+========================================================= */
+
+.animal {
+    position: relative;
+
+    z-index: 5;
+
+    font-size: 35px;
+
+    filter: grayscale(1);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   PRIMERA SELECCIÓN
+========================================================= */
+
+.tile.initial-selectable {
+    cursor: pointer;
+}
+
+.tile.initial-selectable:hover {
+    transform: scale(1.04);
+
+    border-color: #63ff96;
+}
+
+
+/* =========================================================
+   POSICIÓN ACTUAL
+========================================================= */
+
+.tile.current-tile {
+    border-color: #ff5c5c;
+
+    box-shadow:
+        inset 0 0 18px rgba(255, 60, 60, 0.18),
+        0 0 10px rgba(255, 60, 60, 0.10);
+}
+
+
+/* =========================================================
+   CASILLA MEDIO LLENA / ROJA
+========================================================= */
+
+.tile.half-tile {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(110, 42, 42, 0.97),
+            rgba(62, 23, 26, 0.97)
+        );
+
+    border-color: rgba(185, 75, 75, 0.8);
+
+    box-shadow:
+        inset 0 0 15px rgba(255, 60, 60, 0.12);
+}
+
+
+/* =========================================================
+   MOVIMIENTO VÁLIDO
+========================================================= */
+
+.tile.valid-move {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(105, 115, 120, 0.97),
+            rgba(55, 65, 70, 0.97)
+        );
+
+    border-color: #8b9ba3;
+
+    cursor: pointer;
+
+    box-shadow:
+        inset 0 0 14px rgba(255,255,255,0.08);
+}
+
+.tile.valid-move:hover {
+    transform: scale(1.05);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(135, 150, 155, 0.97),
+            rgba(75, 90, 95, 0.97)
+        );
+
+    border-color: #d0e0e8;
+}
+
+/* =========================================================
+   CASILLA ROJA + MOVIMIENTO VÁLIDO
+
+   EL ROJO TIENE PRIORIDAD SOBRE EL GRIS
+========================================================= */
+
+.tile.half-tile.valid-move {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(125, 42, 42, 0.98),
+            rgba(72, 22, 27, 0.98)
+        );
+
+    border-color: #e06565;
+
+    cursor: pointer;
+
+    box-shadow:
+        inset 0 0 18px rgba(255, 60, 60, 0.18),
+        0 0 8px rgba(255, 70, 70, 0.12);
+}
+
+
+.tile.half-tile.valid-move:hover {
+    transform: scale(1.05);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(155, 52, 52, 0.98),
+            rgba(90, 28, 32, 0.98)
+        );
+
+    border-color: #ff8a8a;
+
+    box-shadow:
+        inset 0 0 20px rgba(255, 80, 80, 0.25),
+        0 0 12px rgba(255, 70, 70, 0.20);
+}
+
+/* =========================================================
+   CASILLA ELIMINADA
+========================================================= */
+
+.tile.empty-tile {
+    background:
+        linear-gradient(
+            135deg,
+            #07131a,
+            #031018
+        );
+
+    border-color: #102a37;
+
+    cursor: default;
+}
+
+.tile.empty-tile::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 8px;
+
+    border:
+        1px solid
+        rgba(40, 100, 125, 0.18);
+
+    border-radius: 4px;
+}
+
+.tile.empty-tile::after {
+    content: "";
+
+    position: absolute;
+
+    width: 50%;
+    height: 1px;
+
+    background:
+        rgba(40, 100, 125, 0.25);
+
+    top: 50%;
+    left: 25%;
+}
+
+
+/* =========================================================
+   LEYENDA
+========================================================= */
+
+.legend {
+    margin-top: 20px;
+
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    gap: 25px;
+
+    color: #8fcaff;
+
+    font-size: 13px;
+}
+
+.legend strong {
+    color: #63ff96;
+}
+
+
+/* =========================================================
+   COMBO
+========================================================= */
+
+.combo-popup {
+    position: absolute;
+
+    top: 35px;
+    left: 50%;
+
+    z-index: 100;
+
+    transform:
+        translateX(-50%)
+        scale(0.8);
+
+    color: #63ff96;
+
+    font-size: 30px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    text-shadow:
+        0 0 20px #63ff96;
+
+    transition:
+        opacity 0.15s,
+        transform 0.15s;
+}
+
+.combo-popup.visible {
+    opacity: 1;
+
+    transform:
+        translateX(-50%)
+        scale(1);
+}
+
+
+/* =========================================================
+   RESULTADOS
+========================================================= */
+
+.success {
+    color: #63ff96;
+
+    text-shadow:
+        0 0 15px rgba(99, 255, 150, 0.5);
+}
+
+.error {
+    color: #ff5875;
+
+    text-shadow:
+        0 0 15px rgba(255, 80, 110, 0.5);
+}
+
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+.timer-container {
+    height: 16px;
+
+    margin-top: 18px;
+
+    border: 1px solid #24495f;
+
+    background: #03101a;
+
+    overflow: hidden;
+}
+
+.timer-bar {
+    width: 100%;
+    height: 100%;
+
+    background: #ff8c32;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+    margin-top: 18px;
+
+    display: flex;
+    justify-content: space-between;
+
+    color: #5894c0;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    body {
+        padding: 5px;
+    }
+
+    .game-container {
+        padding: 15px;
+    }
+
+    .board {
+        grid-template-columns: repeat(7, 42px);
+        grid-template-rows: repeat(7, 42px);
+    }
+
+    .tile {
+        width: 42px;
+        height: 42px;
+    }
+
+    .animal {
+        font-size: 24px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="game-container">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="topbar">
+
+        <div>
+
+            <div class="brand-small">
+
+                <span class="status-dot"></span>
+
+                LAFAUNA_OS
+
+            </div>
+
+            <h1>THERMITE</h1>
+
+        </div>
+
+
+        <div class="top-right">
+
+            <span class="tag">
+                TARGET_CHAIN
+            </span>
+
+            <span class="tag live">
+                LIVE
+            </span>
+
+            <button
+                class="back-button"
+                id="backButton"
+            >
+                ←
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         ESTADÍSTICAS
+    ====================================================== -->
+
+    <div class="stats">
+
+        <span>
+            SCORE
+            <strong id="scoreText">0</strong>
+        </span>
+
+        <span>
+            TARGET
+            <strong id="targetText">24</strong>
+        </span>
+
+        <span>
+            COMBO
+            <strong id="comboText">X0</strong>
+        </span>
+
+        <span>
+            TIME
+            <strong id="timeText">30.0S</strong>
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         JUEGO
+    ====================================================== -->
+
+    <main class="game-area">
+
+
+        <!-- =================================================
+             MENÚ
+        ================================================== -->
+
+        <section
+            class="screen"
+            id="startScreen"
+        >
+
+            <div class="phase-title">
+                SELECT PROTOCOL
+            </div>
+
+            <div class="phase-subtitle">
+                CHOOSE TARGET SCORE
+            </div>
+
+            <div class="instructions">
+
+                SELECCIONA UNA PIEZA PARA INICIAR LA CADENA.
+                DESPUÉS SOLO PODRÁS PULSAR LAS CASILLAS GRISES.
+                RATÓN = 1, RANA = 2, PÁJARO = 3.
+                LA PRIMERA CONEXIÓN PONE LA CASILLA ROJA.
+                LA SEGUNDA CONEXIÓN LA ELIMINA.
+
+            </div>
+
+
+            <div class="mode-container">
+
+                <button
+                    class="mode-button selected"
+                    data-mode="SEWER"
+                >
+                    SEWER
+
+                    <br><br>
+
+                    TARGET // 24
+                </button>
+
+
+                <button
+                    class="mode-button"
+                    data-mode="VAULT"
+                >
+                    VAULT
+
+                    <br><br>
+
+                    TARGET // 28
+                </button>
+
+
+                <button
+                    class="mode-button"
+                    data-mode="ART_ASYLUM"
+                >
+                    ART ASYLUM
+
+                    <br><br>
+
+                    TARGET // 30
+                </button>
+
+            </div>
+
+
+            <button
+                class="start-button"
+                id="startButton"
+            >
+                START
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             TABLERO
+        ================================================== -->
+
+        <section
+            class="screen hidden"
+            id="gameScreen"
+        >
+
+            <div
+                class="combo-popup"
+                id="comboPopup"
+            >
+                COMBO +1
+            </div>
+
+
+            <div
+                class="board"
+                id="board"
+            ></div>
+
+
+            <div class="legend">
+
+                <span>
+                    🐀
+                    <strong>SHORT // 1</strong>
+                </span>
+
+                <span>
+                    🐸
+                    <strong>MEDIUM // 2</strong>
+                </span>
+
+                <span>
+                    🐦
+                    <strong>LONG // 3</strong>
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             VICTORIA
+        ================================================== -->
+
+        <section
+            class="screen hidden"
+            id="winScreen"
+        >
+
+            <div class="phase-title success">
+                ACCESS GRANTED
+            </div>
+
+            <div
+                class="phase-subtitle"
+                id="winScore"
+            >
+                FINAL SCORE // 0
+            </div>
+
+            <button
+                class="start-button"
+                id="restartWin"
+            >
+                RESTART
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             DERROTA
+        ================================================== -->
+
+        <section
+            class="screen hidden"
+            id="loseScreen"
+        >
+
+            <div class="phase-title error">
+                ACCESS DENIED
+            </div>
+
+            <div
+                class="phase-subtitle"
+                id="loseScore"
+            >
+                TARGET NOT REACHED
+            </div>
+
+            <button
+                class="start-button"
+                id="restartLose"
+            >
+                RETRY
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         TIMER
+    ====================================================== -->
+
+    <div class="timer-container">
+
+        <div
+            class="timer-bar"
+            id="timerBar"
+        ></div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="footer">
+
+        <span>
+            ZOOM: C$ROB:THERMITE_ROOM
+        </span>
+
+        <span>
+            V2.0 // SECURE CONNECTION
+        </span>
+
+    </footer>
+
+</div>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+
+/* =========================================================
+   CONFIGURACIÓN
+========================================================= */
+
+const GAME_TIME = 30000;
+
+const COMBO_MAX_DELAY = 1000;
+
+const BOARD_SIZE = 7;
+
+
+const MODES = {
+
+    SEWER: 24,
+
+    VAULT: 28,
+
+    ART_ASYLUM: 30
+
+};
+
+
+/*
+    RATÓN  = 1
+    RANA   = 2
+    PÁJARO = 3
+*/
+
+const ANIMALS = [
+
+    {
+        name: "SHORT",
+        icon: "🐀",
+        range: 1
+    },
+
+    {
+        name: "MEDIUM",
+        icon: "🐸",
+        range: 2
+    },
+
+    {
+        name: "LONG",
+        icon: "🐦",
+        range: 3
+    }
+
+];
+
+
+/* =========================================================
+   ELEMENTOS HTML
+========================================================= */
+
+const screens =
+    document.querySelectorAll(".screen");
+
+
+const startScreen =
+    document.getElementById("startScreen");
+
+const gameScreen =
+    document.getElementById("gameScreen");
+
+const winScreen =
+    document.getElementById("winScreen");
+
+const loseScreen =
+    document.getElementById("loseScreen");
+
+
+const board =
+    document.getElementById("board");
+
+
+const startButton =
+    document.getElementById("startButton");
+
+const restartWin =
+    document.getElementById("restartWin");
+
+const restartLose =
+    document.getElementById("restartLose");
+
+const backButton =
+    document.getElementById("backButton");
+
+
+const scoreText =
+    document.getElementById("scoreText");
+
+const targetText =
+    document.getElementById("targetText");
+
+const comboText =
+    document.getElementById("comboText");
+
+const timeText =
+    document.getElementById("timeText");
+
+const timerBar =
+    document.getElementById("timerBar");
+
+
+const comboPopup =
+    document.getElementById("comboPopup");
+
+
+const winScore =
+    document.getElementById("winScore");
+
+const loseScore =
+    document.getElementById("loseScore");
+
+
+const modeButtons =
+    document.querySelectorAll(".mode-button");
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let selectedMode =
+    "SEWER";
+
+let targetScore =
+    24;
+
+let score =
+    0;
+
+let comboCount =
+    0;
+
+let gameActive =
+    false;
+
+let chainStarted =
+    false;
+
+let gameStartTime =
+    0;
+
+let animationFrame =
+    null;
+
+let boardData =
+    [];
+
+let currentTile =
+    null;
+
+let validMoves =
+    [];
+
+let eliminationHistory =
+    [];
+
+
+/* =========================================================
+   MOSTRAR PANTALLA
+========================================================= */
+
+function showScreen(screen) {
+
+    screens.forEach(
+        function(element) {
+
+            element.classList.add(
+                "hidden"
+            );
+
+        }
+    );
+
+
+    screen.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================================
+   SELECCIONAR DIFICULTAD
+========================================================= */
+
+modeButtons.forEach(
+    function(button) {
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                selectedMode =
+                    button.dataset.mode;
+
+
+                targetScore =
+                    MODES[selectedMode];
+
+
+                targetText.textContent =
+                    targetScore;
+
+
+                modeButtons.forEach(
+                    function(element) {
+
+                        element.classList.remove(
+                            "selected"
+                        );
+
+                    }
+                );
+
+
+                button.classList.add(
+                    "selected"
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   COPIAR ANIMAL
+========================================================= */
+
+function cloneAnimal(animal) {
+
+    return {
+
+        name:
+            animal.name,
+
+        icon:
+            animal.icon,
+
+        range:
+            animal.range
+
+    };
+
+}
+
+
+/* =========================================================
+   CREAR TABLERO
+========================================================= */
+
+function createBoard() {
+
+    boardData = [];
+
+    currentTile = null;
+
+    validMoves = [];
+
+    chainStarted = false;
+
+
+    for (
+        let row = 0;
+        row < BOARD_SIZE;
+        row++
+    ) {
+
+        boardData[row] = [];
+
+
+        for (
+            let col = 0;
+            col < BOARD_SIZE;
+            col++
+        ) {
+
+            const randomAnimal =
+
+                ANIMALS[
+                    Math.floor(
+                        Math.random()
+                        *
+                        ANIMALS.length
+                    )
+                ];
+
+
+            boardData[row][col] = {
+
+                animal:
+                    cloneAnimal(
+                        randomAnimal
+                    ),
+
+                state:
+                    "full"
+
+            };
+
+        }
+
+    }
+
+
+    renderBoard();
+
+}
+
+
+/* =========================================================
+   DIBUJAR TABLERO
+========================================================= */
+
+function renderBoard() {
+
+    board.innerHTML =
+        "";
+
+
+    for (
+        let row = 0;
+        row < BOARD_SIZE;
+        row++
+    ) {
+
+        for (
+            let col = 0;
+            col < BOARD_SIZE;
+            col++
+        ) {
+
+            const data =
+                boardData[row][col];
+
+
+            const tile =
+                document.createElement(
+                    "div"
+                );
+
+
+            tile.className =
+                "tile";
+
+
+            /*
+                ANTES DE INICIAR LA CADENA
+                TODAS LAS PIEZAS PUEDEN SELECCIONARSE
+            */
+
+            if (
+                !chainStarted
+                &&
+                data.state !== "empty"
+            ) {
+
+                tile.classList.add(
+                    "initial-selectable"
+                );
+
+            }
+
+
+            /*
+                CASILLA HALF
+            */
+
+            if (
+                data.state === "half"
+            ) {
+
+                tile.classList.add(
+                    "half-tile"
+                );
+
+            }
+
+
+            /*
+                CASILLA EMPTY
+            */
+
+            if (
+                data.state === "empty"
+            ) {
+
+                tile.classList.add(
+                    "empty-tile"
+                );
+
+            }
+
+
+            /*
+                POSICIÓN ACTUAL
+            */
+
+            if (
+                currentTile
+                &&
+                currentTile.row === row
+                &&
+                currentTile.col === col
+            ) {
+
+                tile.classList.add(
+                    "current-tile"
+                );
+
+            }
+
+
+            /*
+                MOVIMIENTO VÁLIDO
+            */
+
+            const isValidMove =
+
+                validMoves.some(
+                    function(move) {
+
+                        return (
+
+                            move.row === row
+
+                            &&
+
+                            move.col === col
+
+                        );
+
+                    }
+                );
+
+
+            if (isValidMove) {
+
+                tile.classList.add(
+                    "valid-move"
+                );
+
+            }
+
+
+            /*
+                DIBUJAR ANIMAL
+
+                FULL = visible
+                HALF = visible
+                EMPTY = invisible
+            */
+
+            if (
+                data.animal
+                &&
+                data.state !== "empty"
+            ) {
+
+                const animalElement =
+
+                    document.createElement(
+                        "span"
+                    );
+
+
+                animalElement.className =
+                    "animal";
+
+
+                animalElement.textContent =
+                    data.animal.icon;
+
+
+                tile.appendChild(
+                    animalElement
+                );
+
+            }
+
+
+            tile.addEventListener(
+                "click",
+                function() {
+
+                    handleTileClick(
+                        row,
+                        col
+                    );
+
+                }
+            );
+
+
+            board.appendChild(
+                tile
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   GESTIONAR CLIC
+========================================================= */
+
+function handleTileClick(
+    row,
+    col
+) {
+
+    if (!gameActive) {
+
+        return;
+
+    }
+
+
+    const tile =
+        boardData[row][col];
+
+
+    /*
+    =====================================================
+    LA CADENA TODAVÍA NO HA EMPEZADO
+
+    AQUÍ SÍ SE PUEDE ELEGIR CUALQUIER ANIMAL.
+    =====================================================
+    */
+
+    if (!chainStarted) {
+
+        if (
+            tile.animal
+            &&
+            tile.state !== "empty"
+        ) {
+
+            startChain(
+                row,
+                col
+            );
+
+        }
+
+
+        return;
+
+    }
+
+
+    /*
+    =====================================================
+    LA CADENA YA ESTÁ INICIADA.
+
+    SOLO SE PUEDEN PULSAR MOVIMIENTOS VÁLIDOS.
+    =====================================================
+    */
+
+    const isValidMove =
+
+        validMoves.some(
+            function(move) {
+
+                return (
+
+                    move.row === row
+
+                    &&
+
+                    move.col === col
+
+                );
+
+            }
+        );
+
+
+    /*
+        SI NO ES GRIS,
+        NO HACEMOS NADA.
+    */
+
+    if (!isValidMove) {
+
+        return;
+
+    }
+
+
+    /*
+        CONTINUAR CADENA
+    */
+
+    continueChain(
+        row,
+        col
+    );
+
+}
+
+
+/* =========================================================
+   EMPEZAR CADENA
+========================================================= */
+
+function startChain(row, col) {
+
+    const tile = boardData[row][col];
+
+
+    /*
+        COMPROBAR QUE LA CASILLA
+        TIENE UN ANIMAL Y NO ESTÁ VACÍA
+    */
+
+    if (
+        !tile.animal ||
+        tile.state === "empty"
+    ) {
+        return;
+    }
+
+
+    /*
+        INICIAMOS LA CADENA
+    */
+
+    chainStarted = true;
+
+
+    /*
+    =====================================================
+    LA PRIMERA CASILLA PASA A ROJO
+    =====================================================
+    */
+
+    if (tile.state === "full") {
+
+        tile.state = "half";
+
+
+        /*
+            GENERAMOS UN NUEVO ANIMAL ALEATORIO
+        */
+
+        const randomAnimal =
+
+            ANIMALS[
+                Math.floor(
+                    Math.random()
+                    *
+                    ANIMALS.length
+                )
+            ];
+
+
+        /*
+            CAMBIAMOS EL ANIMAL ORIGINAL
+            POR EL NUEVO ANIMAL ALEATORIO
+        */
+
+        tile.animal =
+
+            cloneAnimal(
+                randomAnimal
+            );
+
+    }
+
+
+    /*
+        LA CASILLA SELECCIONADA PASA
+        A SER LA POSICIÓN ACTUAL
+    */
+
+    currentTile = {
+
+        row: row,
+
+        col: col
+
+    };
+
+
+    /*
+        LOS PRIMEROS MOVIMIENTOS SE CALCULAN
+        USANDO EL NUEVO ANIMAL ALEATORIO
+    */
+
+    validMoves =
+
+        calculateMoves(
+
+            row,
+
+            col,
+
+            tile.animal.range
+
+        );
+
+
+    renderBoard();
+
+}
+
+/* =========================================================
+   CONTINUAR CADENA
+========================================================= */
+
+function continueChain(
+    destinationRow,
+    destinationCol
+) {
+
+    /*
+        GUARDAMOS LA CASILLA DE DESTINO.
+    */
+
+    const destination =
+
+        boardData[
+            destinationRow
+        ][
+            destinationCol
+        ];
+
+
+    /*
+        GUARDAMOS EL ANIMAL ANTES
+        DE MODIFICAR LA CASILLA.
+
+        ESTE ANIMAL DETERMINARÁ
+        EL SIGUIENTE MOVIMIENTO.
+    */
+
+    const destinationAnimal =
+
+        destination.animal
+        ?
+        cloneAnimal(
+            destination.animal
+        )
+        :
+        null;
+
+
+    /*
+    =====================================================
+    FULL -> HALF
+
+    PRIMERA CONEXIÓN.
+
+    FONDO ROJO.
+
+    EL ANIMAL NO DESAPARECE.
+    =====================================================
+    */
+
+    if (
+    destination.state === "full"
+) {
+
+    /*
+        LA CASILLA PASA A FONDO ROJO
+    */
+
+    destination.state = "half";
+
+
+    /*
+        ELEGIMOS UN ANIMAL ALEATORIO
+    */
+
+    const randomAnimal =
+
+        ANIMALS[
+            Math.floor(
+                Math.random()
+                *
+                ANIMALS.length
+            )
+        ];
+
+
+    /*
+        CAMBIAMOS EL ANIMAL DE LA CASILLA
+        POR EL NUEVO ANIMAL ALEATORIO
+    */
+
+    destination.animal =
+
+        cloneAnimal(
+            randomAnimal
+        );
+
+
+    /*
+        UN MOVIMIENTO SIN ELIMINACIÓN
+        REINICIA EL COMBO
+    */
+
+    resetCombo();
+
+}
+
+
+    /*
+    =====================================================
+    HALF -> EMPTY
+
+    SEGUNDA CONEXIÓN.
+
+    DESAPARECE ANIMAL Y FONDO.
+
+    +1 PUNTO.
+    =====================================================
+    */
+
+    else if (
+        destination.state === "half"
+    ) {
+
+        destination.state =
+            "empty";
+
+
+        destination.animal =
+            null;
+
+
+        /*
+            LA ELIMINACIÓN SE REGISTRA
+            SEGÚN EL ALCANCE DEL ANIMAL ELIMINADO.
+        */
+
+        if (destinationAnimal) {
+
+            registerElimination(
+                destinationAnimal.name
+            );
+
+        }
+
+    }
+
+
+    /*
+    =====================================================
+    NUEVA POSICIÓN ACTUAL
+
+    LA CADENA CONTINÚA DESDE EL DESTINO.
+    =====================================================
+    */
+
+    currentTile = {
+
+        row:
+            destinationRow,
+
+        col:
+            destinationCol
+
+    };
+
+
+    /*
+    =====================================================
+    EL SIGUIENTE MOVIMIENTO DEPENDE
+    DEL ANIMAL AL QUE ACABAMOS DE LLEGAR.
+
+    RATÓN  -> 1
+    RANA   -> 2
+    PÁJARO -> 3
+    =====================================================
+    */
+
+    if (destinationAnimal) {
+
+        validMoves =
+
+            calculateMoves(
+
+                destinationRow,
+
+                destinationCol,
+
+                destinationAnimal.range
+
+            );
+
+    }
+
+    else {
+
+        validMoves = [];
+
+    }
+
+
+    renderBoard();
+
+}
+
+
+/* =========================================================
+   CALCULAR MOVIMIENTOS
+========================================================= */
+
+function calculateMoves(
+    startRow,
+    startCol,
+    range
+) {
+
+    const moves =
+        [];
+
+
+    /*
+        8 DIRECCIONES:
+
+        ARRIBA
+        ABAJO
+        IZQUIERDA
+        DERECHA
+        4 DIAGONALES
+    */
+
+    const directions = [
+
+        [-1, 0],
+
+        [1, 0],
+
+        [0, -1],
+
+        [0, 1],
+
+        [-1, -1],
+
+        [-1, 1],
+
+        [1, -1],
+
+        [1, 1]
+
+    ];
+
+
+    directions.forEach(
+        function(direction) {
+
+            const destinationRow =
+
+                startRow
+
+                +
+
+                direction[0]
+                *
+                range;
+
+
+            const destinationCol =
+
+                startCol
+
+                +
+
+                direction[1]
+                *
+                range;
+
+
+            /*
+                FUERA DEL TABLERO
+            */
+
+            if (
+                destinationRow < 0
+
+                ||
+
+                destinationRow >= BOARD_SIZE
+
+                ||
+
+                destinationCol < 0
+
+                ||
+
+                destinationCol >= BOARD_SIZE
+            ) {
+
+                return;
+
+            }
+
+
+            /*
+                NO SE PUEDE IR A UNA CASILLA
+                COMPLETAMENTE ELIMINADA.
+            */
+
+            if (
+                boardData[
+                    destinationRow
+                ][
+                    destinationCol
+                ].state
+                ===
+                "empty"
+            ) {
+
+                return;
+
+            }
+
+
+            moves.push({
+
+                row:
+                    destinationRow,
+
+                col:
+                    destinationCol
+
+            });
+
+        }
+    );
+
+
+    return moves;
+
+}
+
+
+/* =========================================================
+   REINICIAR COMBO
+========================================================= */
+
+function resetCombo() {
+
+    comboCount =
+        0;
+
+    eliminationHistory =
+        [];
+
+    updateInterface();
+
+}
+
+
+/* =========================================================
+   REGISTRAR ELIMINACIÓN
+========================================================= */
+
+function registerElimination(
+    range
+) {
+
+    const now =
+        performance.now();
+
+
+    /*
+        +1 POR ELIMINACIÓN
+    */
+
+    score++;
+
+
+    /*
+        SI HA PASADO MÁS DE 1 SEGUNDO
+        DESDE LA ANTERIOR ELIMINACIÓN,
+        SE REINICIA LA CADENA DE COMBOS.
+    */
+
+    if (
+        eliminationHistory.length > 0
+    ) {
+
+        const previous =
+
+            eliminationHistory[
+                eliminationHistory.length - 1
+            ];
+
+
+        if (
+            now - previous.time
+            >
+            COMBO_MAX_DELAY
+        ) {
+
+            eliminationHistory =
+                [];
+
+            comboCount =
+                0;
+
+        }
+
+    }
+
+
+    eliminationHistory.push({
+
+        range:
+            range,
+
+        time:
+            now
+
+    });
+
+
+    /*
+        SOLO NECESITAMOS
+        LAS 3 ÚLTIMAS ELIMINACIONES.
+    */
+
+    if (
+        eliminationHistory.length > 3
+    ) {
+
+        eliminationHistory.shift();
+
+    }
+
+
+    checkCombo();
+
+
+    updateInterface();
+
+
+    /*
+        VICTORIA INMEDIATA
+        AL LLEGAR AL OBJETIVO.
+    */
+
+    if (
+        score >= targetScore
+    ) {
+
+        winGame();
+
+    }
+
+}
+
+
+/* =========================================================
+   COMPROBAR COMBO
+========================================================= */
+
+function checkCombo() {
+
+    if (
+        eliminationHistory.length !== 3
+    ) {
+
+        return;
+
+    }
+
+
+    const first =
+        eliminationHistory[0];
+
+    const second =
+        eliminationHistory[1];
+
+    const third =
+        eliminationHistory[2];
+
+
+    /*
+        COMPROBAR QUE CADA ELIMINACIÓN
+        OCURRIÓ EN MENOS DE 1 SEGUNDO.
+    */
+
+    const validTime =
+
+        second.time
+        -
+        first.time
+        <=
+        COMBO_MAX_DELAY
+
+        &&
+
+        third.time
+        -
+        second.time
+        <=
+        COMBO_MAX_DELAY;
+
+
+    if (!validTime) {
+
+        comboCount =
+            0;
+
+        eliminationHistory =
+            [];
+
+        return;
+
+    }
+
+
+    const sequence = [
+
+        first.range,
+
+        second.range,
+
+        third.range
+
+    ];
+
+
+    /*
+        3 IGUALES
+    */
+
+    const allEqual =
+
+        sequence[0]
+        ===
+        sequence[1]
+
+        &&
+
+        sequence[1]
+        ===
+        sequence[2];
+
+
+    /*
+        SHORT -> MEDIUM -> LONG
+    */
+
+    const ascending =
+
+        sequence[0]
+        ===
+        "SHORT"
+
+        &&
+
+        sequence[1]
+        ===
+        "MEDIUM"
+
+        &&
+
+        sequence[2]
+        ===
+        "LONG";
+
+
+    /*
+        LONG -> MEDIUM -> SHORT
+    */
+
+    const descending =
+
+        sequence[0]
+        ===
+        "LONG"
+
+        &&
+
+        sequence[1]
+        ===
+        "MEDIUM"
+
+        &&
+
+        sequence[2]
+        ===
+        "SHORT";
+
+
+    /*
+        NO ES COMBO
+    */
+
+    if (
+        !allEqual
+
+        &&
+
+        !ascending
+
+        &&
+
+        !descending
+    ) {
+
+        comboCount =
+            0;
+
+        eliminationHistory =
+            [];
+
+        return;
+
+    }
+
+
+    /*
+        BONUS EXPONENCIAL
+
+        PRIMERO = 1
+        SEGUNDO = 2
+        TERCERO = 4
+        CUARTO = 8
+    */
+
+    const bonus =
+
+        Math.pow(
+            2,
+            comboCount
+        );
+
+
+    score +=
+        bonus;
+
+
+    comboCount++;
+
+
+    showCombo(
+        bonus
+    );
+
+
+    /*
+        EL SIGUIENTE COMBO NECESITA
+        3 ELIMINACIONES NUEVAS.
+    */
+
+    eliminationHistory =
+        [];
+
+}
+
+
+/* =========================================================
+   MOSTRAR COMBO
+========================================================= */
+
+function showCombo(
+    bonus
+) {
+
+    comboPopup.textContent =
+
+        "COMBO X"
+
+        +
+
+        comboCount
+
+        +
+
+        " // +"
+
+        +
+
+        bonus;
+
+
+    comboPopup.classList.add(
+        "visible"
+    );
+
+
+    setTimeout(
+        function() {
+
+            comboPopup.classList.remove(
+                "visible"
+            );
+
+        },
+        700
+    );
+
+}
+
+
+/* =========================================================
+   ACTUALIZAR INTERFAZ
+========================================================= */
+
+function updateInterface() {
+
+    scoreText.textContent =
+        score;
+
+
+    targetText.textContent =
+        targetScore;
+
+
+    comboText.textContent =
+        "X"
+        +
+        comboCount;
+
+}
+
+
+/* =========================================================
+   INICIAR JUEGO
+========================================================= */
+
+function startGame() {
+
+    if (animationFrame) {
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+    }
+
+
+    score =
+        0;
+
+    comboCount =
+        0;
+
+    eliminationHistory =
+        [];
+
+    chainStarted =
+        false;
+
+    currentTile =
+        null;
+
+    validMoves =
+        [];
+
+    gameActive =
+        true;
+
+
+    targetScore =
+        MODES[selectedMode];
+
+
+    createBoard();
+
+
+    updateInterface();
+
+
+    timerBar.style.width =
+        "100%";
+
+
+    timeText.textContent =
+        "30.0S";
+
+
+    showScreen(
+        gameScreen
+    );
+
+
+    gameStartTime =
+        performance.now();
+
+
+    updateTimer();
+
+}
+
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+function updateTimer() {
+
+    if (!gameActive) {
+
+        return;
+
+    }
+
+
+    const elapsed =
+
+        performance.now()
+
+        -
+
+        gameStartTime;
+
+
+    const remaining =
+
+        Math.max(
+
+            0,
+
+            GAME_TIME - elapsed
+
+        );
+
+
+    const percentage =
+
+        remaining
+
+        /
+
+        GAME_TIME
+
+        *
+
+        100;
+
+
+    timerBar.style.width =
+
+        percentage
+        +
+        "%";
+
+
+    timeText.textContent =
+
+        (
+            remaining
+            /
+            1000
+        )
+
+        .toFixed(1)
+
+        +
+
+        "S";
+
+
+    if (
+        remaining <= 0
+    ) {
+
+        loseGame();
+
+        return;
+
+    }
+
+
+    animationFrame =
+
+        requestAnimationFrame(
+            updateTimer
+        );
+
+}
+
+
+/* =========================================================
+   GANAR
+========================================================= */
+
+function winGame() {
+
+    gameActive =
+        false;
+
+
+    if (animationFrame) {
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+    }
+
+
+    winScore.textContent =
+
+        "FINAL SCORE // "
+
+        +
+
+        score
+
+        +
+
+        " / "
+
+        +
+
+        targetScore;
+
+
+    showScreen(
+        winScreen
+    );
+
+}
+
+
+/* =========================================================
+   PERDER
+========================================================= */
+
+function loseGame() {
+
+    gameActive =
+        false;
+
+
+    if (animationFrame) {
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+    }
+
+
+    timerBar.style.width =
+        "0%";
+
+
+    timeText.textContent =
+        "0.0S";
+
+
+    loseScore.textContent =
+
+        "FINAL SCORE // "
+
+        +
+
+        score
+
+        +
+
+        " / "
+
+        +
+
+        targetScore;
+
+
+    showScreen(
+        loseScreen
+    );
+
+}
+
+
+/* =========================================================
+   EVENTOS
+========================================================= */
+
+startButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+restartWin.addEventListener(
+    "click",
+    function() {
+
+        showScreen(
+            startScreen
+        );
+
+    }
+);
+
+
+restartLose.addEventListener(
+    "click",
+    function() {
+
+        showScreen(
+            startScreen
+        );
+
+    }
+);
+
+
+backButton.addEventListener(
+    "click",
+    function() {
+
+        window.location.href =
+            "index.html";
+
+    }
+);
+
+
+});
+
+</script>
+
+</body>
+</html>
