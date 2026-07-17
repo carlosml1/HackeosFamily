@@ -192,21 +192,21 @@ setPersistence(
     auth,
     browserLocalPersistence
 )
-.then(() => {
+    .then(() => {
 
-    console.log(
-        "PERSISTENCIA ACTIVADA"
-    );
+        console.log(
+            "PERSISTENCIA ACTIVADA"
+        );
 
-})
-.catch(error => {
+    })
+    .catch(error => {
 
-    console.error(
-        "ERROR PERSISTENCIA:",
-        error
-    );
+        console.error(
+            "ERROR PERSISTENCIA:",
+            error
+        );
 
-});
+    });
 
 
 /* =========================================================
@@ -348,27 +348,69 @@ function mostrarWhitelist(nombre) {
 
 }
 
+/* =========================================================
+   COMPROVACION DE USUARIOS VIPS
+========================================================= */
+
+async function comprobarVip(nombreUsuario) {
+
+    try {
+
+        const vipRef = doc(db, "vips", "usuariosVips");
+        const vipSnap = await getDoc(vipRef);
+
+        const sumaNumeroCard =
+            document.querySelector('a[href="sumaNumero.html"]');
+
+        if (!sumaNumeroCard) return;
+
+        if (!vipSnap.exists()) {
+            sumaNumeroCard.style.display = "none";
+            return;
+        }
+
+        const usuario = nombreUsuario.trim().toLowerCase();
+
+        const lista = (vipSnap.data().lista || [])
+            .map(nombre => String(nombre).trim().toLowerCase());
+
+        if (lista.includes(usuario)) {
+            sumaNumeroCard.style.display = "";
+        } else {
+            sumaNumeroCard.style.display = "none";
+        }
+
+    } catch (error) {
+
+        console.error("ERROR VIP:", error);
+
+        const thermiteCard =
+            document.querySelector('a[href="thermite.html"]');
+
+        if (thermiteCard) {
+            thermiteCard.style.display = "none";
+        }
+
+    }
+
+}
+
 
 /* =========================================================
    MOSTRAR WEB
 ========================================================= */
 
-function mostrarWeb() {
+async function mostrarWeb(nombreUsuario) {
 
     ocultarPantallas();
 
-    mainApp
-        .classList
-        .remove("hidden");
-
+    mainApp.classList.remove("hidden");
 
     if (logoutButton) {
-
-        logoutButton
-            .classList
-            .remove("hidden");
-
+        logoutButton.classList.remove("hidden");
     }
+
+    await comprobarVip(nombreUsuario);
 
 }
 
@@ -1083,7 +1125,11 @@ async function comprobarWhitelist(user) {
             );
 
 
-            mostrarWeb();
+            await mostrarWeb(
+                datos.nombre ||
+                user.displayName ||
+                "UNKNOWN"
+            );
 
 
             return;

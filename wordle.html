@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width,initial-scale=1">
+   <title>Wordle Numérico</title>
+   <style>
+      * {
+         margin: 0;
+         padding: 0;
+         box-sizing: border-box
+      }
+
+      body {
+         background: #06111a;
+         color: #d9ecff;
+         font-family: Consolas, monospace
+      }
+
+      .terminal {
+         width: 98%;
+         margin: 15px auto;
+         border: 1px solid #1c8fe8;
+         padding: 25px;
+         min-height: 95vh
+      }
+
+      .topbar {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         margin-bottom: 25px
+      }
+
+      .status {
+         display: flex;
+         align-items: center;
+         gap: 10px;
+         color: #7fc9ff
+      }
+
+      .dot {
+         width: 10px;
+         height: 10px;
+         border-radius: 50%;
+         background: #63ff96
+      }
+
+      .buttons {
+         display: flex;
+         gap: 10px
+      }
+
+      .small,
+      .live,
+      .back {
+         background: #071723;
+         color: #d9ecff;
+         border: 1px solid #2c8de0;
+         padding: 8px 18px;
+         cursor: pointer;
+         font-family: inherit
+      }
+
+      .live {
+         color: #63ff96;
+         border-color: #63ff96
+      }
+
+      .back {
+         width: 45px
+      }
+
+      .wrap {
+         border: 1px solid #1c8fe8;
+         padding: 40px;
+         min-height: 650px;
+         display: flex;
+         flex-direction: column;
+         align-items: center
+      }
+
+      #top {
+         width: 100%
+      }
+
+      h1 {
+         text-align: left;
+         letter-spacing: 8px;
+         font-size: 60px;
+         text-shadow: 0 0 10px #fff, 0 0 25px #5baeff;
+         margin-bottom: 30px
+      }
+
+      #guess {
+         display: flex;
+         gap: 10px;
+         margin-top: 50px
+      }
+
+      #guess input {
+         width: 70px;
+         height: 70px;
+         text-align: center;
+         font-size: 34px;
+         background: #0c1822;
+         color: #fff;
+         border: 2px solid #2c8de0;
+         outline: none
+      }
+
+      #guess input:focus {
+         border-color: #63ff96
+      }
+
+      #feedback {
+         display: flex;
+         gap: 10px;
+         margin-top: 15px
+      }
+
+      .mark {
+         width: 70px;
+         height: 10px;
+         background: #081723;
+         border: 2px solid #334
+      }
+
+      .green {
+         background: #2ecc71
+      }
+
+      .orange {
+         background: #d58b00
+      }
+
+      .red {
+         background: #c0392b
+      }
+
+      #enter {
+         margin: 35px auto;
+         padding: 14px 45px;
+         font-size: 20px;
+         background: #071723;
+         border: 2px solid #63ff96;
+         color: #63ff96;
+         cursor: pointer;
+         font-family: inherit
+      }
+
+      #msg {
+         text-align: center;
+         font-size: 34px;
+         margin-top: 20px
+      }
+
+      .footer {
+         margin-top: 20px
+      }
+
+      #timeBar {
+         width: 100%;
+         height: 12px;
+         border: 1px solid #ff8a2a;
+         background: #2b1705;
+         overflow: hidden
+      }
+
+      #timeFill {
+         width: 100%;
+         height: 100%;
+         background: #ff8a2a;
+         transition: width .05s linear
+      }
+
+      .footerInfo {
+         margin-top: 18px;
+         display: flex;
+         justify-content: space-between;
+         color: #5aaeff;
+         font-size: 13px
+      }
+   </style>
+</head>
+
+<body>
+   <div class="terminal">
+      <header class="topbar">
+         <div class="status"><span class="dot"></span>LAFAUNA_OS</div>
+         <div class="buttons">
+            <button class="small">TARGET_CHAIN</button>
+            <button class="live">LIVE</button>
+            <button class="back" onclick="history.back()">←</button>
+         </div>
+      </header>
+
+      <div class="wrap">
+         <div id="top">
+            <h1>WORDLE</h1>
+         </div>
+         <div id="guess"></div>
+         <div id="feedback">
+            <div class="mark"></div>
+            <div class="mark"></div>
+            <div class="mark"></div>
+            <div class="mark"></div>
+            <div class="mark"></div>
+         </div>
+         <button id="enter">ENTER</button>
+         <div id="msg"></div>
+      </div>
+
+      <footer class="footer">
+         <div id="timeBar">
+            <div id="timeFill"></div>
+         </div>
+         <div class="footerInfo">
+            <div>ZOOM: WORDLE_ROOM</div>
+            <div>V2.0 // SECURE CONNECTION</div>
+         </div>
+      </footer>
+   </div>
+
+   <script>
+      const length = 5;
+      let secret = [];
+      for (let i = 0; i < length; i++) secret.push(Math.floor(Math.random() * 9) + 1);
+
+      const guess = document.getElementById("guess");
+      const msg = document.getElementById("msg");
+      const timerFill = document.getElementById("timeFill");
+      const marks = document.querySelectorAll(".mark");
+
+      for (let i = 0; i < length; i++) {
+         let inp = document.createElement("input");
+         inp.maxLength = 1;
+         inp.inputMode = "numeric";
+         inp.addEventListener("input", e => {
+            e.target.value = e.target.value.replace(/[^1-9]/g, "");
+            if (e.target.value && i < length - 1) guess.children[i + 1].focus();
+         });
+         guess.appendChild(inp);
+      }
+
+      let start = performance.now(), playing = true;
+
+      function tick() {
+         if (!playing) return;
+         const total = 15;
+         const remain = Math.max(0, total - (performance.now() - start) / 1000);
+         const percent = remain / total * 100;
+         timerFill.style.width = percent + "%";
+         if (percent > 60) timerFill.style.background = "#ff8a2a";
+         else if (percent > 30) timerFill.style.background = "#ff6b00";
+         else timerFill.style.background = "#d63232";
+         if (remain <= 0) {
+            playing = false;
+            timerFill.style.width = "0%";
+            msg.style.color = "#ff6666";
+            msg.innerHTML = "ACCESS DENIED<br>CÓDIGO: " + secret.join("");
+            return;
+         }
+         requestAnimationFrame(tick);
+      }
+      tick();
+
+      document.getElementById("enter").onclick = () => {
+         if (!playing) return;
+         let vals = [...guess.children].map(i => i.value);
+         if (vals.some(v => v === "")) return;
+         vals = vals.map(Number);
+
+         let usedS = Array(length).fill(false);
+         let usedG = Array(length).fill(false);
+         let colors = Array(length).fill("red");
+
+         for (let i = 0; i < length; i++) {
+            if (vals[i] === secret[i]) {
+               colors[i] = "green";
+               usedS[i] = usedG[i] = true;
+            }
+         }
+         for (let i = 0; i < length; i++) {
+            if (usedG[i]) continue;
+            for (let j = 0; j < length; j++) {
+               if (!usedS[j] && vals[i] === secret[j]) {
+                  colors[i] = "orange";
+                  usedS[j] = true;
+                  break;
+               }
+            }
+         }
+         for (let i = 0; i < length; i++) marks[i].className = "mark " + colors[i];
+         if (colors.every(c => c === "green")) {
+            playing = false;
+            msg.style.color = "#63ff96";
+            msg.textContent = "ACCESS GRANTED";
+         }
+         [...guess.children].forEach(i => i.value = "");
+         guess.children[0].focus();
+      };
+      guess.children[0].focus();
+   </script>
+</body>
+
+</html>
