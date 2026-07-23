@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consola de Administración</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #020b14;
+            color: #d8eaff;
+            font-family: Courier New, monospace;
+        }
+
+        .container {
+            width: 95%;
+            margin: 20px auto;
+        }
+
+        h1 {
+            color: #68ff91;
+        }
+
+        .toolbar {
+            margin: 20px 0;
+        }
+
+        input {
+            width: 300px;
+            padding: 10px;
+            background: #03131f;
+            border: 2px solid #3180b8;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #3180b8;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #03131f;
+        }
+
+        tr:nth-child(even) {
+            background: #071b2d;
+        }
+
+        button {
+            padding: 8px 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>💻 Consola de Administración</h1>
+
+        <div class="toolbar">
+            <input id="buscar" placeholder="Buscar usuario...">
+        </div>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Admin</th>
+                    <th>Consola</th>
+                    <th>Fecha</th>
+                    <th>Guardar</th>
+                </tr>
+            </thead>
+
+            <tbody id="usuarios"></tbody>
+
+        </table>
+
+    </div>
+
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+        import {
+            getFirestore,
+            collection,
+            getDocs,
+            doc,
+            updateDoc
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+        import {
+            getAuth,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+        const firebaseConfig = {
+
+            apiKey:
+                "AIzaSyD6tu5Yfjrt_GeCugcYAha5bmUU5yfkByk",
+
+            authDomain:
+                "pruebasfirepad.firebaseapp.com",
+
+            projectId:
+                "pruebasfirepad",
+
+            storageBucket:
+                "pruebasfirepad.firebasestorage.app",
+
+            messagingSenderId:
+                "4463672678",
+
+            appId:
+                "1:4463672678:web:1e007a953292f3add95ca7",
+
+            measurementId:
+                "G-4DDBYYNSSV"
+
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const tbody = document.getElementById("usuarios");
+        const buscar = document.getElementById("buscar");
+
+        let datos = [];
+
+        async function cargar() {
+
+            try {
+
+                const snap = await getDocs(collection(db, "usuarios"));
+
+                datos = [];
+
+                snap.forEach(docu => {
+
+                    datos.push({
+                        id: docu.id,
+                        ...docu.data()
+                    });
+
+                });
+
+                dibujar(datos);
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(error.message);
+
+            }
+
+            datos = [];
+
+            snap.forEach(docu => {
+
+                datos.push({
+                    id: docu.id,
+                    ...docu.data()
+                });
+
+            });
+
+            dibujar(datos);
+
+        }
+
+        function dibujar(lista) {
+
+            tbody.innerHTML = "";
+
+            lista.forEach(usuario => {
+
+                const tr = document.createElement("tr");
+
+                const fecha = usuario.fechaRegistro?.toDate
+                    ? usuario.fechaRegistro.toDate().toLocaleString()
+                    : "-";
+
+                tr.innerHTML = `
+<td><input value="${usuario.nombre}" class="nombre"></td>
+
+<td><input type="checkbox" class="admin" ${usuario.admin ? "checked" : ""}></td>
+
+<td><input type="checkbox" class="consola" ${usuario.consola ? "checked" : ""}></td>
+
+<td>${fecha}</td>
+
+<td><button>Guardar</button></td>
+`;
+
+                tr.querySelector("button").onclick = async () => {
+
+                    await updateDoc(doc(db, "usuarios", usuario.id), {
+
+                        nombre: tr.querySelector(".nombre").value,
+
+                        admin: tr.querySelector(".admin").checked,
+
+                        consola: tr.querySelector(".consola").checked
+
+                    });
+
+                    alert("Guardado");
+
+                };
+
+                tbody.appendChild(tr);
+
+            });
+
+        }
+
+        buscar.oninput = () => {
+
+            const texto = buscar.value.toLowerCase();
+
+            dibujar(
+                datos.filter(x =>
+                    (x.nombre || "").toLowerCase().includes(texto)
+                )
+            );
+
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+
+            if (!user) {
+                location.href = "index.html";
+                return;
+            }
+
+            await cargar();
+
+        });
+
+    </script>
+
+</body>
+
+</html>

@@ -22,7 +22,10 @@ import {
     doc,
     setDoc,
     getDoc,
-    serverTimestamp
+    serverTimestamp,
+    updateDoc,
+    collection,
+    getDocs
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
@@ -108,6 +111,9 @@ const authChangeMode =
 
 const logoutButton =
     document.getElementById("logoutButton");
+
+const consoleButton =
+    document.getElementById("consoleButton");
 
 const mainApp =
     document.getElementById("mainApp");
@@ -658,6 +664,8 @@ async function crearPerfilFirestore(
                 admin:
                     false,
 
+                consola: false,
+
                 fechaRegistro:
                     serverTimestamp()
             }
@@ -1124,6 +1132,19 @@ async function comprobarWhitelist(user) {
                 "ACCESS GRANTED"
             );
 
+            if (consoleButton) {
+
+                if (datos.consola === true) {
+
+                    consoleButton.classList.remove("hidden");
+
+                } else {
+
+                    consoleButton.classList.add("hidden");
+
+                }
+
+            }
 
             await mostrarWeb(
                 datos.nombre ||
@@ -1479,3 +1500,29 @@ actualizarModo();
 console.log(
     "FIREBASE AUTH INICIADO CORRECTAMENTE"
 );
+
+/* =========================================================
+   CONTROLAR CONSOLA
+========================================================= */
+
+if (consoleButton) {
+
+    consoleButton
+        .classList
+        .add("hidden");
+
+}
+
+if (consoleButton) {
+
+    consoleButton.addEventListener(
+        "click",
+        () => {
+
+            window.location.href = "consola.html";
+
+        }
+    );
+
+}
+
