@@ -6,6 +6,79 @@
     <meta name='viewport' content='width=device-width,initial-scale=1'>
     <title>Cypher Constraints</title>
     <style>
+        /* ---------- PANTALLAS ---------- */
+
+        .screen {
+            position: fixed;
+            inset: 0;
+            background: #06111a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .window {
+            width: 420px;
+            background: #071723;
+            border: 1px solid #1c8fe8;
+            padding: 30px;
+        }
+
+        .window h2 {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .window input {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #06111a;
+            color: white;
+            border: 1px solid #2c8de0;
+        }
+
+        .window button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            background: #0b2032;
+            color: white;
+            border: 1px solid #2c8de0;
+            cursor: pointer;
+        }
+
+        .window button:hover {
+            background: #12324d;
+        }
+
+        .homeBox {
+            width: 420px;
+            text-align: center;
+        }
+
+        .homeBox h1 {
+            margin-bottom: 40px;
+        }
+
+        .homeBox button {
+            width: 100%;
+            padding: 18px;
+            margin-top: 18px;
+            font-size: 20px;
+        }
+
+        .slot {
+            border: 1px solid #1c8fe8;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -118,7 +191,109 @@
 </head>
 
 <body>
-    <div class='terminal'>
+    <!-- ================= MENU ================= -->
+
+    <div id="screenHome" class="screen">
+
+        <div class="homeBox">
+
+            <h1>CYPHER CONSTRAINTS</h1>
+
+            <button id="btnCreateRoom">
+                CREAR SALA
+            </button>
+
+            <button id="btnJoinRoom">
+                UNIRSE A SALA
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= CREAR ================= -->
+
+    <div id="screenCreate" class="screen hidden">
+
+        <div class="window">
+
+            <h2>CREAR SALA</h2>
+
+            <input id="playerName" placeholder="Nombre">
+
+            <input id="roomPassword" type="password" placeholder="Contraseña">
+
+            <button id="createRoom">
+                CREAR SALA
+            </button>
+
+            <button class="goHome">
+                VOLVER
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= UNIRSE ================= -->
+
+    <div id="screenJoin" class="screen hidden">
+
+        <div class="window">
+
+            <h2>UNIRSE</h2>
+
+            <input id="currentRoomCode" placeholder="Código de sala">
+
+            <input id="joinName" placeholder="Nombre">
+
+            <input id="joinPassword" type="password" placeholder="Contraseña">
+
+            <button id="joinRoom">
+                ENTRAR
+            </button>
+
+            <button class="goHome">
+                VOLVER
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= ESPERA ================= -->
+
+    <div id="screenLobby" class="screen hidden">
+
+        <div class="window">
+
+            <h2>SALA</h2>
+
+            <h3 id="lobbyCode">----</h3>
+
+            <div class="slot" id="slot1">P1 · Esperando...</div>
+
+            <div class="slot" id="slot2">P2 · Esperando...</div>
+
+            <div class="slot" id="slot3">P3 · Esperando...</div>
+
+            <div class="slot" id="slot4">P4 · Esperando...</div>
+
+            <br>
+
+            <div id="waitingText">
+
+                Esperando jugadores...
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="terminal hidden" id="gameScreen">
         <div class='topbar'>
             <div class='status'>● LAFAUNA_OS</div>
             <div class='buttons'><button>CYPHER_CONSTRAINTS</button><button>LIVE</button><button
@@ -151,7 +326,16 @@
             </div>
         </div>
     </div>
-    <script>
+    <script type="module" src="auth-guard.js"></script>
+    <script type="module">
+        import {
+            realtimeDB,
+            roomRef,
+            roomSet,
+            roomGet,
+            roomUpdate,
+            roomOnValue
+        } from "./auth-guard.js";
 
         const games = [
             { pin: [1, 4, 7, 2], clues: [{ player: 1, text: "#1<#2." }, { player: 2, text: "#2+#3=11." }, { player: 3, text: "#4 es par." }, { player: 4, text: "La suma es 14." }] },
@@ -190,35 +374,29 @@
         const vals = [0, 0, 0, 0];
         let lives = 3;
         let round = 1;
+        let playerSlot = null;
+        let gameIndex = 0;
+        let roundChanging = false;
+        let startTime = Date.now();
+        let gameFinished = false;
 
 
 
         // Pintar pistas
         const panel = document.querySelector(".panel");
 
-        panel.innerHTML = "<h2>TU PISTA</h2>";
-
-        clues.forEach(c => {
-
-            panel.innerHTML += `
-        <div class="clue">
-            <b>Jugador ${c.player}</b><br>
-            ${c.text}
-        </div>
-    `;
-
-        });
-
-        panel.innerHTML += `
-<button id="lock">LOCK</button>
-<div id="msg"></div>
-`;
-
         const p = document.getElementById("players");
+
+        console.log("playerSlot:", playerSlot);
+        console.log("currentRoomCode:", window.currentRoomCode);
 
         function draw() {
 
             p.innerHTML = "";
+            console.log("DRAW", {
+                playerSlot,
+                currentRoomCode: window.currentRoomCode
+            });
 
             vals.forEach((v, i) => {
 
@@ -226,15 +404,31 @@
 
                 d.className = "player";
 
+                const puedeMover =
+
+                    !window.currentRoomCode ||
+
+                    playerSlot === ("p" + (i + 1));
+
                 d.innerHTML = `
-            <div>P${i + 1}</div>
+                    <div>P${i + 1}</div>
 
-            <button onclick="chg(${i},-1)">-</button>
+                    <button
+                        onclick="chg(${i},-1)"
+                        ${puedeMover ? "" : "disabled"}
+                    >
+                        -
+                    </button>
 
-            <div class="num">${v}</div>
+                    <div class="num">${v}</div>
 
-            <button onclick="chg(${i},1)">+</button>
-        `;
+                    <button
+                        onclick="chg(${i},1)"
+                        ${puedeMover ? "" : "disabled"}
+                    >
+                        +
+                    </button>
+                `;
 
                 p.appendChild(d);
 
@@ -242,11 +436,122 @@
 
         }
 
-        window.chg = (i, s) => {
+        async function sincronizarValores() {
+
+            await roomUpdate(
+
+                roomRef(realtimeDB, "rooms/" + window.currentRoomCode),
+
+                {
+
+                    values: vals
+
+                }
+
+            );
+
+        }
+        async function sincronizarRonda() {
+
+            await roomUpdate(
+
+                roomRef(realtimeDB, "rooms/" + window.currentRoomCode),
+
+                {
+
+                    round
+
+                }
+
+            );
+
+        }
+
+        async function sincronizarNuevoJuego() {
+
+            gameIndex = Math.floor(Math.random() * games.length);
+
+            await roomUpdate(
+
+                roomRef(realtimeDB, "rooms/" + window.currentRoomCode),
+
+                {
+
+                    gameIndex
+
+                }
+
+            );
+
+        }
+
+        async function sincronizarVidas() {
+
+            await roomUpdate(
+
+                roomRef(realtimeDB, "rooms/" + window.currentRoomCode),
+
+                {
+
+                    lives
+
+                }
+
+            );
+
+        }
+
+        async function sincronizarEstado(estado) {
+
+            await roomUpdate(
+
+                roomRef(realtimeDB, "rooms/" + window.currentRoomCode),
+
+                {
+
+                    gameState: estado
+
+                }
+
+            );
+
+        }
+
+        window.chg = async (i, s) => {
+
+            console.log({
+                i,
+                playerSlot,
+                currentRoomCode: window.currentRoomCode
+            });
+
+            if (gameFinished) {
+
+                return;
+
+            }
+
+            if (
+
+                window.currentRoomCode &&
+
+                playerSlot !== ("p" + (i + 1))
+
+            ) {
+
+                return;
+
+            }
 
             vals[i] = (vals[i] + s + 10) % 10;
 
             draw();
+
+            if (window.currentRoomCode) {
+
+                await sincronizarValores();
+
+            }
 
         };
 
@@ -254,40 +559,97 @@
 
         let currentGame = game;
 
-        function loadGame() {
+        function mostrarPistaJugador() {
 
-            currentGame = games[Math.floor(Math.random() * games.length)];
+            if (!playerSlot) return;
+
+            const numeroJugador = parseInt(playerSlot.replace("p", ""));
+
+            panel.innerHTML = "<h2>TU PISTA</h2>";
+
+            const pista = currentGame.clues.find(
+                c => c.player === numeroJugador
+            );
+
+            if (pista) {
+
+                panel.innerHTML += `
+            <div class="clue">
+                <b>Jugador ${numeroJugador}</b><br>
+                ${pista.text}
+            </div>
+        `;
+
+            }
+
+            panel.innerHTML += `
+        <button id="lock">LOCK</button>
+        <div id="msg"></div>
+    `;
+
+            document.getElementById("lock").onclick = checkPin;
+
+        }
+
+        async function loadGame() {
+
+            currentGame = games[gameIndex];
 
             secret.length = 0;
             currentGame.pin.forEach(n => secret.push(n));
 
-            panel.innerHTML = "<h2>TU PISTA</h2>";
-
-            currentGame.clues.forEach(c => {
-                panel.innerHTML += `
-        <div class="clue">
-            <b>Jugador ${c.player}</b><br>
-            ${c.text}
-        </div>`;
-            });
-
-            panel.innerHTML += `
-    <button id="lock">LOCK</button>
-    <div id="msg"></div>`;
-
+            mostrarPistaJugador()
             vals.fill(0);
             draw();
+            roundChanging = false;
+            gameFinished = false;
+            if (window.currentRoomCode && playerSlot === "p1") {
 
-            document.getElementById("lock").onclick = checkPin;
+                startTime = Date.now();
+
+                await roomUpdate(
+                    roomRef(realtimeDB, "rooms/" + window.currentRoomCode),
+                    {
+                        startTime
+                    }
+                );
+
+            } else {
+
+                start = Date.now();
+
+            }
         }
 
-        function checkPin() {
+        async function checkPin() {
 
-            if (vals.join() == secret.join()) {
+
+            if (gameFinished) {
+
+                return;
+
+            }
+
+            if (roundChanging) {
+
+                return;
+
+            }
+
+            if (vals.join() === secret.join()) {
 
                 round++;
+                roundChanging = true;
 
-                if (round > 3) {
+                if (window.currentRoomCode) {
+
+                    await sincronizarNuevoJuego();
+
+                    await sincronizarRonda();
+
+                }
+
+                if (round === 4) {
 
                     document.getElementById("round").textContent = "3";
 
@@ -296,6 +658,12 @@
 
                     document.getElementById("lock").disabled = true;
 
+                    if (window.currentRoomCode) {
+
+                        await sincronizarEstado("win");
+
+                    }
+                    gameFinished = true;
                     return;
                 }
 
@@ -310,6 +678,12 @@
 
                 lives--;
 
+                if (window.currentRoomCode) {
+
+                    await sincronizarVidas();
+
+                }
+
                 document.getElementById("lives").textContent = "●".repeat(Math.max(0, lives));
 
                 document.getElementById("msg").innerHTML =
@@ -317,27 +691,486 @@
                         ? "PIN incorrecto"
                         : '<span style="color:#f66">ACCESS DENIED</span>';
 
-                if (lives <= 0)
+                if (lives <= 0) {
+                    gameFinished = true;
                     document.getElementById("lock").disabled = true;
+
+                    if (window.currentRoomCode) {
+
+                        await sincronizarEstado("lose");
+
+                    }
+
+                }
             }
         }
 
         document.getElementById("lock").onclick = checkPin;
         // Temporizador
         const total = 150;
-        const start = performance.now();
+        let start = Date.now();
         const fill = document.getElementById("timeFill");
 
-        (function timer() {
+        (async function timer() {
 
-            let r = Math.max(0, total - (performance.now() - start) / 1000);
+            let r = Math.max(
+                0,
+                total - (Date.now() - start) / 1000
+            );
 
             fill.style.width = (r / total * 100) + "%";
 
-            if (r > 0 && lives > 0)
-                requestAnimationFrame(timer);
+            if (r <= 0 && !gameFinished) {
 
-        })();    
+                gameFinished = true;
+
+                document.getElementById("msg").innerHTML =
+                    '<span style="color:#f66">TIME OVER</span>';
+
+                document.getElementById("lock").disabled = true;
+
+                if (window.currentRoomCode) {
+
+                    await sincronizarEstado("lose");
+
+                }
+
+                return;
+
+            }
+
+            if (
+                r > 0 &&
+                lives > 0 &&
+                !gameFinished
+            ) {
+                requestAnimationFrame(timer);
+            }
+
+        })();
+
+        /*==================================================
+=            NAVEGACIÓN ENTRE PANTALLAS             =
+==================================================*/
+
+        const screenHome = document.getElementById("screenHome");
+        const screenCreate = document.getElementById("screenCreate");
+        const screenJoin = document.getElementById("screenJoin");
+        const screenLobby = document.getElementById("screenLobby");
+        const gameScreen = document.getElementById("gameScreen");
+
+        function hideAllScreens() {
+
+            screenHome.classList.add("hidden");
+            screenCreate.classList.add("hidden");
+            screenJoin.classList.add("hidden");
+            screenLobby.classList.add("hidden");
+            gameScreen.classList.add("hidden");
+
+        }
+
+        function showScreen(screen) {
+
+            hideAllScreens();
+
+            screen.classList.remove("hidden");
+
+        }
+
+        document.getElementById("btnCreateRoom").onclick = () => {
+
+            showScreen(screenCreate);
+
+        };
+
+        document.getElementById("btnJoinRoom").onclick = () => {
+
+            showScreen(screenJoin);
+
+        };
+
+        document.querySelectorAll(".goHome").forEach(btn => {
+
+            btn.onclick = () => {
+
+                showScreen(screenHome);
+
+            };
+
+        });
+
+
+        /* SOLO PARA PRUEBAS */
+
+        /*=========================================================
+=            CREAR Y UNIRSE A SALAS (REAL)                =
+=========================================================*/
+
+        function generarCodigoSala() {
+
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+            let codigo = "";
+
+            for (let i = 0; i < 6; i++) {
+
+                codigo += chars[Math.floor(Math.random() * chars.length)];
+
+            }
+
+            return codigo;
+
+        }
+
+
+        async function crearSala() {
+
+            const nombre = document.getElementById("playerName").value.trim();
+
+            const password = document.getElementById("roomPassword").value.trim();
+
+            if (nombre === "") {
+
+                alert("Introduce un nombre");
+
+                return;
+
+            }
+
+            const codigo = generarCodigoSala();
+
+            await roomSet(
+                roomRef(realtimeDB, "rooms/" + codigo),
+                {
+                    password,
+                    status: "waiting",
+                    gameState: "playing",
+                    startTime: Date.now(),
+                    players: {
+                        p1: {
+                            name: nombre,
+                            ready: false
+                        }
+                    }
+                }
+            );
+
+            lives = 3;
+
+            round = 1;
+
+            roundChanging = false;
+
+            gameFinished = false;
+
+            vals.fill(0);
+
+            document.getElementById("round").textContent = round;
+
+            document.getElementById("lives").textContent =
+                "●".repeat(lives);
+
+            gameIndex = Math.floor(Math.random() * games.length);
+
+            currentGame = games[gameIndex];
+
+            secret.length = 0;
+
+            currentGame.pin.forEach(n => secret.push(n));
+
+            await roomUpdate(
+
+                roomRef(realtimeDB, "rooms/" + codigo),
+
+                {
+
+                    gameIndex
+
+                }
+
+            );
+
+            window.currentRoomCode = codigo;
+            playerSlot = "p1";
+            draw()
+
+            console.log("window.currentRoomCode =", window.currentRoomCode);
+            console.log("playerSlot =", playerSlot);
+
+            document.getElementById("lobbyCode").textContent = codigo;
+
+            showScreen(screenLobby);
+
+            escucharSala(codigo);
+            mostrarPistaJugador();
+
+        }
+
+        async function unirseSala() {
+
+            const codigo = document.getElementById("currentRoomCode").value.trim().toUpperCase();
+
+            const nombre = document.getElementById("joinName").value.trim();
+
+            const password = document.getElementById("joinPassword").value.trim();
+
+            const sala = await roomGet(
+
+                roomRef(realtimeDB, "rooms/" + codigo)
+
+            );
+
+            if (!sala.exists()) {
+
+                alert("La sala no existe");
+
+                return;
+
+            }
+
+            const datos = sala.val();
+
+            if (datos.password !== password) {
+
+                alert("Contraseña incorrecta");
+
+                return;
+
+            }
+
+            const jugadores = datos.players || {};
+
+            let posicion = null;
+
+            for (let i = 1; i <= 4; i++) {
+
+                if (!jugadores["p" + i]) {
+
+                    posicion = "p" + i;
+
+                    break;
+
+                }
+
+            }
+
+            if (posicion === null) {
+
+                alert("La sala está llena");
+
+                return;
+
+            }
+
+            jugadores[posicion] = {
+
+                name: nombre,
+
+                ready: false
+
+            };
+
+            await roomUpdate(
+
+                roomRef(realtimeDB, "rooms/" + codigo),
+
+                {
+
+                    players: jugadores
+
+                }
+
+            );
+
+            window.currentRoomCode = codigo;
+            playerSlot = posicion;
+            draw()
+
+            document.getElementById("lobbyCode").textContent = codigo;
+
+            showScreen(screenLobby);
+
+            escucharSala(codigo);
+            mostrarPistaJugador();
+
+        }
+
+        document.getElementById("createRoom").onclick = crearSala;
+
+        document.getElementById("joinRoom").onclick = unirseSala;
+
+
+        /* Para volver al juego durante las pruebas */
+
+        window.startTestGame = function () {
+
+            showScreen(gameScreen);
+
+        };
+
+        /*=========================================================
+=      SINCRONIZACIÓN DEL LOBBY EN TIEMPO REAL            =
+=========================================================*/
+
+        function escucharSala(codigo) {
+
+            roomOnValue(
+
+                roomRef(realtimeDB, "rooms/" + codigo),
+
+                (snap) => {
+
+                    if (!snap.exists()) return;
+
+                    const sala = snap.val();
+
+                    if (
+                        sala.startTime &&
+                        sala.startTime !== startTime
+                    ) {
+
+                        startTime = sala.startTime;
+                        start = startTime;
+
+                    }
+
+                    if (
+
+                        sala.gameIndex !== undefined &&
+
+                        sala.gameIndex !== gameIndex
+
+                    ) {
+
+                        gameIndex = sala.gameIndex;
+
+                        currentGame = games[gameIndex];
+
+                        secret.length = 0;
+
+                        currentGame.pin.forEach(n => secret.push(n));
+
+                        mostrarPistaJugador();
+
+                    }
+
+                    if (
+
+                        sala.round !== undefined &&
+
+                        sala.round !== round
+
+                    ) {
+
+                        round = sala.round;
+
+                        document.getElementById("round").textContent = round;
+
+                        void loadGame();
+
+                    }
+
+                    if (
+
+                        sala.lives !== undefined &&
+
+                        sala.lives !== lives
+
+                    ) {
+
+                        lives = sala.lives;
+
+                        document.getElementById("lives").textContent =
+                            "●".repeat(Math.max(0, lives));
+
+                        if (lives <= 0) {
+
+                            gameFinished = true;
+                            document.getElementById("lock").disabled = true;
+
+                        }
+
+                    }
+
+                    if (sala.gameState === "win") {
+                        gameFinished = true;
+                        document.getElementById("msg").innerHTML =
+                            '<span style="color:#63ff96;font-size:20px;">✔ MISIÓN COMPLETADA</span>';
+
+                        document.getElementById("lock").disabled = true;
+
+                    }
+
+                    if (sala.gameState === "lose") {
+                        gameFinished = true;
+                        document.getElementById("msg").innerHTML =
+                            '<span style="color:#f66">ACCESS DENIED</span>';
+
+                        document.getElementById("lock").disabled = true;
+
+                    }
+
+                    if (sala.values) {
+
+                        for (let i = 0; i < 4; i++) {
+
+                            vals[i] = sala.values[i];
+
+                        }
+
+                        draw();
+
+                    }
+
+                    const jugadores = sala.players || {};
+
+                    for (let i = 1; i <= 4; i++) {
+
+                        const slot = document.getElementById("slot" + i);
+
+                        if (jugadores["p" + i]) {
+
+                            slot.textContent = "P" + i + " · " + jugadores["p" + i].name;
+
+                        } else {
+
+                            slot.textContent = "P" + i + " · Esperando...";
+
+                        }
+
+                    }
+
+                    let total = 0;
+
+                    for (const k in jugadores) {
+
+                        total++;
+
+                    }
+
+                    document.getElementById("waitingText").textContent =
+
+                        total + "/4 jugadores conectados";
+
+                    if (total === 4) {
+
+                        document.getElementById("waitingText").textContent =
+
+                            "Todos conectados. Preparando partida...";
+
+                        setTimeout(() => {
+
+                            showScreen(gameScreen);
+
+                        }, 1500);
+
+                    }
+
+                }
+
+            );
+
+        }
     </script>
 </body>
 
